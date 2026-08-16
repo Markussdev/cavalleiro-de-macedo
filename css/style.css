@@ -592,69 +592,23 @@ ol {
 }
 
 /* Practice */
-.practice__notice {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    width: fit-content;
-    margin: -28px 0 30px;
-    padding: 8px 13px;
-    border: 1px solid rgba(166, 79, 45, 0.22);
-    border-radius: 999px;
-    color: var(--color-accent-text);
-    font-size: 0.68rem;
-    font-weight: 500;
-}
-
 .practice__grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
 }
 
 .practice-card {
     position: relative;
     display: grid;
-    min-height: 265px;
-    grid-template-columns: auto 1fr auto;
+    min-height: 215px;
+    grid-template-columns: auto 1fr;
     align-items: start;
-    gap: 26px;
-    overflow: hidden;
-    padding: 34px;
+    gap: 18px;
+    padding: 28px;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
     background: var(--color-surface);
-    transition:
-        transform var(--transition),
-        background-color var(--transition),
-        border-color var(--transition);
-}
-
-.practice-card::after {
-    position: absolute;
-    right: -60px;
-    bottom: -80px;
-    width: 160px;
-    aspect-ratio: 1;
-    transform: scale(0.45);
-    border-radius: 50%;
-    background: var(--color-accent);
-    content: "";
-    opacity: 0;
-    transition:
-        transform 500ms cubic-bezier(0.22, 1, 0.36, 1),
-        opacity var(--transition);
-}
-
-.practice-card:hover {
-    transform: translateY(-5px);
-    border-color: #c5cec9;
-    background: var(--color-surface-muted);
-}
-
-.practice-card:hover::after {
-    transform: scale(1);
-    opacity: 0.12;
 }
 
 .practice-card__number {
@@ -663,44 +617,19 @@ ol {
     font-weight: 600;
 }
 
-.practice-card__status {
-    display: block;
-    margin-bottom: 43px;
-    color: var(--color-text-muted);
-    font-size: 0.62rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-}
-
 .practice-card h3 {
     font-family: var(--font-serif);
-    font-size: clamp(1.85rem, 3vw, 2.35rem);
+    font-size: clamp(1.55rem, 2.1vw, 2rem);
     font-weight: 400;
     letter-spacing: -0.025em;
-    line-height: 1;
+    line-height: 1.04;
 }
 
 .practice-card p {
-    max-width: 370px;
-    margin-top: 16px;
+    margin-top: 15px;
     color: var(--color-text-muted);
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     line-height: 1.65;
-}
-
-.practice-card__arrow {
-    display: grid;
-    width: 38px;
-    height: 38px;
-    place-items: center;
-    border: 1px solid var(--color-border);
-    border-radius: 50%;
-    font-size: 0.9rem;
-    transition: transform var(--transition);
-}
-
-.practice-card:hover .practice-card__arrow {
-    transform: translate(3px, -3px);
 }
 
 /* About */
@@ -733,70 +662,55 @@ ol {
 
 .about__portrait-art {
     position: relative;
-    display: grid;
     min-height: 625px;
     overflow: hidden;
-    place-items: center;
     border-radius: 220px 220px var(--radius-lg) var(--radius-lg);
-    background:
-        linear-gradient(135deg, transparent 60%, rgba(197, 111, 71, 0.24)),
-        var(--color-primary-soft);
-}
-
-.about__portrait-art::before,
-.about__portrait-art::after {
-    position: absolute;
-    width: 1px;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.08);
-    content: "";
+    background: var(--color-primary-soft);
 }
 
 .about__portrait-art::before {
-    left: 33%;
-}
-
-.about__portrait-art::after {
-    right: 33%;
-}
-
-.about__portrait-mark {
-    position: relative;
+    position: absolute;
     z-index: 1;
-    color: rgba(255, 255, 255, 0.86);
-    font-family: var(--font-serif);
-    font-size: clamp(6rem, 11vw, 9rem);
-    font-weight: 400;
-    letter-spacing: -0.09em;
+    inset: 0;
+    background: linear-gradient(to top, rgba(16, 37, 33, 0.58), transparent 38%);
+    content: "";
+    pointer-events: none;
+}
+
+.about__portrait-art img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 18%;
+    filter: saturate(0.88) contrast(1.03);
 }
 
 .about__portrait-ring {
     position: absolute;
+    z-index: 2;
     top: 25%;
     left: 14%;
     width: 72%;
     aspect-ratio: 1;
     border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: 50%;
+    pointer-events: none;
 }
 
 .about__portrait-caption {
     position: absolute;
+    z-index: 3;
     right: 32px;
     bottom: 30px;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.82);
     font-size: 0.62rem;
     letter-spacing: 0.15em;
     line-height: 1.5;
     text-align: right;
+    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.24);
     text-transform: uppercase;
-}
-
-.about__portrait > p {
-    margin-top: 14px;
-    color: rgba(255, 255, 255, 0.45);
-    font-size: 0.62rem;
-    letter-spacing: 0.08em;
 }
 
 .about__content h2 {
@@ -857,6 +771,108 @@ ol {
     color: rgba(255, 255, 255, 0.62);
     font-size: 0.78rem;
     line-height: 1.65;
+}
+
+/* Career */
+.career {
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.career .section-heading h2 {
+    max-width: 740px;
+}
+
+.career__gallery {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+    align-items: start;
+    gap: clamp(28px, 5vw, 64px);
+}
+
+.career-card--secondary {
+    margin-top: 165px;
+}
+
+.career-card__image {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    border-radius: var(--radius-md);
+    background: var(--color-surface-muted);
+}
+
+.career-card__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(0.88) contrast(1.03);
+}
+
+.career-card--primary .career-card__image img {
+    object-position: center 42%;
+}
+
+.career-card--secondary .career-card__image img {
+    object-position: center;
+}
+
+.career-card__archive {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.38);
+    border-radius: 999px;
+    background: rgba(16, 37, 33, 0.68);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: var(--color-white);
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.career-card figcaption {
+    margin-top: 24px;
+}
+
+.career-card figcaption > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.career-card__index,
+.career-card__category {
+    color: var(--color-accent-text);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+}
+
+.career-card__category {
+    text-align: right;
+}
+
+.career-card h3 {
+    margin-top: 18px;
+    font-family: var(--font-serif);
+    font-size: clamp(1.8rem, 3vw, 2.8rem);
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    line-height: 1;
+}
+
+.career-card p {
+    max-width: 470px;
+    margin-top: 13px;
+    color: var(--color-text-muted);
+    font-size: 0.83rem;
+    line-height: 1.7;
 }
 
 /* Process */
@@ -1397,6 +1413,14 @@ html.reduce-motion *::after {
         gap: 45px;
     }
 
+    .practice__grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .career-card--secondary {
+        margin-top: 110px;
+    }
+
     .about__grid {
         gap: 65px;
     }
@@ -1486,6 +1510,16 @@ html.reduce-motion *::after {
 
     .about__content {
         max-width: 650px;
+    }
+
+    .career__gallery {
+        grid-template-columns: 1fr;
+    }
+
+    .career-card--secondary {
+        width: min(86%, 620px);
+        margin-top: 34px;
+        margin-left: auto;
     }
 
     .process__grid {
@@ -1583,20 +1617,10 @@ html.reduce-motion *::after {
     }
 
     .practice-card {
-        min-height: 255px;
+        min-height: 190px;
         grid-template-columns: auto 1fr;
         gap: 18px;
         padding: 27px 22px;
-    }
-
-    .practice-card__status {
-        margin-bottom: 35px;
-    }
-
-    .practice-card__arrow {
-        position: absolute;
-        top: 22px;
-        right: 22px;
     }
 
     .about__grid {
@@ -1606,6 +1630,15 @@ html.reduce-motion *::after {
     .about__details div {
         grid-template-columns: 1fr;
         gap: 5px;
+    }
+
+    .career-card--secondary {
+        width: 100%;
+        margin-top: 28px;
+    }
+
+    .career-card__image {
+        border-radius: 14px;
     }
 
     .contact__grid {
