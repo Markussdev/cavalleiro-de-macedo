@@ -9,20 +9,3 @@ if (!window.supabase?.createClient) {
         SUPABASE_PUBLISHABLE_KEY
     );
 }
-
-async function testarArtigos() {
-    if (!window.supabaseClient) {
-        console.error("SUPABASE: cliente indisponível.");
-        return;
-    }
-
-    const { data, error } = await window.supabaseClient
-        .from("posts")
-        .select("*")
-        .eq("published", true);
-
-    console.log("ARTIGOS:", data);
-    console.log("ERRO:", error);
-}
-
-testarArtigos();

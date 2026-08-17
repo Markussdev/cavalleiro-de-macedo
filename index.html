@@ -8,6 +8,7 @@
         content="Cavalleiro de Macedo Advocacia — atendimento jurídico com clareza, proximidade e responsabilidade."
     >
     <meta name="theme-color" content="#18302d">
+    <link rel="icon" href="./assets/brand/cavalleiro-mark.svg" type="image/svg+xml">
 
     <title>Cavalleiro de Macedo | Advocacia</title>
     
@@ -23,6 +24,7 @@
         defer
     ></script>
     <script src="./js/supabase.js" defer></script>
+    <script src="./js/posts.js" defer></script>
     <script src="./js/main.js" defer></script>
 </head>
 
@@ -340,6 +342,37 @@
                             <p>Palestra em Viseu sobre política municipal de resíduos sólidos.</p>
                         </figcaption>
                     </figure>
+                </div>
+            </div>
+        </section>
+
+        <section
+            class="section publications"
+            id="publicacoes"
+            aria-labelledby="publications-title"
+        >
+            <div class="container">
+                <div class="section-heading section-heading--split" data-reveal>
+                    <div>
+                        <span class="eyebrow">Publicações</span>
+                        <h2 id="publications-title">
+                            Informação jurídica,<br>
+                            com clareza.
+                        </h2>
+                    </div>
+
+                    <p>
+                        Artigos e conteúdos sobre temas relacionados às áreas de atuação profissional.
+                    </p>
+                </div>
+
+                <div
+                    class="publications__grid"
+                    data-posts-grid
+                    aria-live="polite"
+                    aria-busy="true"
+                >
+                    <p class="publications__status">Carregando publicações…</p>
                 </div>
             </div>
         </section>
