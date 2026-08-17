@@ -1,5 +1,5 @@
 /* ================================================================
-   Roberto Cavalleiro de Macedo — template inicial
+   Cavalleiro de Macedo Advocacia — template inicial
    Identidade: editorial, próxima e sem clichês jurídicos
    ================================================================ */
 
@@ -231,24 +231,45 @@ ol {
 
 .brand {
     display: inline-flex;
+    align-items: center;
+    gap: 12px;
     width: fit-content;
+    line-height: 1;
+}
+
+.brand__mark {
+    display: grid;
+    width: 38px;
+    height: 38px;
+    flex: 0 0 auto;
+    place-items: center;
+}
+
+.brand__mark img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.brand__identity {
+    display: flex;
+    min-width: 0;
     flex-direction: column;
-    line-height: 1.05;
 }
 
 .brand__name {
     font-family: var(--font-serif);
-    font-size: 1.12rem;
+    font-size: 1.05rem;
     font-weight: 500;
-    letter-spacing: -0.015em;
+    letter-spacing: -0.02em;
 }
 
 .brand__subtitle {
     margin-top: 6px;
     color: var(--color-text-muted);
-    font-size: 0.59rem;
+    font-size: 0.53rem;
     font-weight: 600;
-    letter-spacing: 0.23em;
+    letter-spacing: 0.25em;
     text-transform: uppercase;
 }
 
@@ -410,32 +431,34 @@ ol {
     position: absolute;
     z-index: 3;
     top: 39px;
-    left: 49px;
+    left: 50%;
+    transform: translateX(-50%);
     color: rgba(255, 255, 255, 0.64);
     font-size: 0.62rem;
     letter-spacing: 0.19em;
     text-transform: uppercase;
+    white-space: nowrap;
 }
 
 .visual__orbit {
     position: absolute;
-    border: 1px solid rgba(255, 255, 255, 0.46);
+    top: 19%;
+    left: 13%;
+    width: 74%;
+    aspect-ratio: 1;
+    border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: 50%;
 }
 
-.visual__orbit--one {
-    top: 18%;
-    left: 10%;
-    width: 82%;
-    aspect-ratio: 1;
-}
-
-.visual__orbit--two {
-    top: 29%;
-    left: 21%;
-    width: 60%;
-    aspect-ratio: 1;
-    border-color: rgba(197, 111, 71, 0.75);
+.visual__horse {
+    position: absolute;
+    z-index: 3;
+    top: 50%;
+    left: 50%;
+    width: 48%;
+    transform: translate(-50%, -52%);
+    filter: brightness(0) invert(1);
+    opacity: 0.94;
 }
 
 .visual__disc {
@@ -446,30 +469,6 @@ ol {
     aspect-ratio: 1;
     border-radius: 50%;
     background: var(--color-accent);
-}
-
-.visual__monogram {
-    position: absolute;
-    z-index: 2;
-    top: 41%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: var(--color-background);
-    font-family: var(--font-serif);
-    font-size: clamp(5.2rem, 10vw, 8.7rem);
-    font-weight: 400;
-    letter-spacing: -0.08em;
-    line-height: 1;
-    white-space: nowrap;
-}
-
-.visual__index {
-    position: absolute;
-    bottom: 38px;
-    left: 43px;
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 0.61rem;
-    letter-spacing: 0.18em;
 }
 
 .visual__word {
@@ -483,16 +482,6 @@ ol {
     font-family: var(--font-serif);
     font-size: 1.1rem;
     letter-spacing: 0.13em;
-    text-transform: uppercase;
-}
-
-.hero__visual-note {
-    display: block;
-    margin-top: 15px;
-    color: var(--color-text-muted);
-    font-size: 0.6rem;
-    letter-spacing: 0.12em;
-    text-align: right;
     text-transform: uppercase;
 }
 
@@ -1047,8 +1036,33 @@ ol {
     padding-bottom: 48px;
 }
 
+.footer__identity {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.brand--footer .brand__mark {
+    width: 46px;
+    height: 46px;
+}
+
 .brand--footer .brand__name {
-    font-size: 1.35rem;
+    font-size: 1.3rem;
+}
+
+.footer__identity > p {
+    display: flex;
+    color: var(--color-text-muted);
+    flex-direction: column;
+    font-size: 0.72rem;
+    line-height: 1.6;
+}
+
+.footer__identity > p span {
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
 }
 
 .footer__back {
@@ -1568,12 +1582,6 @@ html.reduce-motion *::after {
 
     .visual__label {
         top: 31px;
-        left: 35px;
-    }
-
-    .visual__index {
-        bottom: 28px;
-        left: 32px;
     }
 
     .section {
