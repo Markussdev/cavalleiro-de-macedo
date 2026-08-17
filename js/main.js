@@ -145,6 +145,9 @@ const applyAccessibilitySettings = () => {
     contrastButton?.setAttribute("aria-pressed", String(settings.contrast));
     linksButton?.setAttribute("aria-pressed", String(settings.links));
     motionButton?.setAttribute("aria-pressed", String(settings.motion));
+    fontDecrease?.setAttribute("aria-pressed", String(settings.fontLevel < 0));
+    fontReset?.setAttribute("aria-pressed", String(settings.fontLevel === 0));
+    fontIncrease?.setAttribute("aria-pressed", String(settings.fontLevel > 0));
 };
 
 const saveAndApply = () => {

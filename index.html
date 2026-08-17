@@ -11,8 +11,7 @@
 
     <title>Roberto Cavalleiro de Macedo | Advocacia</title>
     
-    <link rel="preconnect" href="ht
-    tps://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap"
@@ -41,7 +40,7 @@
 
             <a class="button button--header" href="#contato">
                 Fale conosco
-                <span aria-hidden="true">↗</span>
+                <span aria-hidden="true">↓</span>
             </a>
 
             <button
@@ -79,7 +78,7 @@
                         </a>
                         <a class="text-link" href="#contato">
                             Fale pelo WhatsApp
-                            <span aria-hidden="true">↗</span>
+                            <span aria-hidden="true">↓</span>
                         </a>
                     </div>
 
@@ -106,32 +105,32 @@
 
         <section class="highlights" aria-label="Destaques do atendimento">
             <div class="container highlights__grid">
-                <article class="highlight" data-reveal>
+                <a class="highlight" href="#atuacao" data-reveal>
                     <span class="highlight__number">01</span>
                     <div>
                         <h2>Atuação</h2>
                         <p>Soluções jurídicas conduzidas com atenção às particularidades de cada situação.</p>
                     </div>
-                    <a href="#atuacao" aria-label="Conheça a atuação">↘</a>
-                </article>
+                    <span class="highlight__action" aria-hidden="true">↓</span>
+                </a>
 
-                <article class="highlight" data-reveal>
+                <a class="highlight" href="#atendimento" data-reveal>
                     <span class="highlight__number">02</span>
                     <div>
                         <h2>Atendimento</h2>
                         <p>Comunicação direta e acompanhamento próximo durante todo o atendimento.</p>
                     </div>
-                    <a href="#atendimento" aria-label="Conheça o atendimento">↘</a>
-                </article>
+                    <span class="highlight__action" aria-hidden="true">↓</span>
+                </a>
 
-                <article class="highlight" data-reveal>
+                <a class="highlight" href="#contato" data-reveal>
                     <span class="highlight__number">03</span>
                     <div>
                         <h2>Contato</h2>
                         <p>Canais digitais para facilitar o primeiro contato e o envio de informações.</p>
                     </div>
-                    <a href="#contato" aria-label="Veja os canais de contato">↘</a>
-                </article>
+                    <span class="highlight__action" aria-hidden="true">↓</span>
+                </a>
             </div>
         </section>
 
@@ -234,8 +233,6 @@
                             loading="lazy"
                             decoding="async"
                         >
-                        <span class="about__portrait-ring" aria-hidden="true"></span>
-                        <span class="about__portrait-caption">Roberto Cavalleiro<br>de Macedo</span>
                     </div>
                 </figure>
 
@@ -262,7 +259,7 @@
                         </div>
                         <div>
                             <dt>Atuação jurídica</dt>
-                            <dd>Direito Administrativo · Direito Imobiliário · Direito Trabalhista · Direito do Consumidor</dd>
+                            <dd>Atuação multidisciplinar em Direito Público e Privado</dd>
                         </div>
                     </dl>
 
@@ -281,11 +278,10 @@
                 <div class="section-heading section-heading--split" data-reveal>
                     <div>
                         <span class="eyebrow">Trajetória profissional</span>
-                        <h2 id="career-title">Experiência construída em diferentes contextos.</h2>
+                        <h2 id="career-title">Registros de atuação</h2>
                     </div>
                     <p>
-                        Registros de uma trajetória que reúne atuação jurídica, relações de trabalho
-                        e participação na gestão ambiental municipal.
+                        Alguns registros da trajetória profissional em diferentes áreas de atuação.
                     </p>
                 </div>
 
@@ -298,7 +294,6 @@
                                 loading="lazy"
                                 decoding="async"
                             >
-                            <span class="career-card__archive">Arquivo · 2011</span>
                         </div>
                         <figcaption>
                             <div>
@@ -306,7 +301,7 @@
                                 <span class="career-card__category">Direito do Trabalho</span>
                             </div>
                             <h3>Assembleia Geral Sindical</h3>
-                            <p>atuação em direitos trabalhistas - Assembleia Geral Sindical</p>
+                            <p>Registro de atuação profissional em contexto sindical.</p>
                         </figcaption>
                     </figure>
 
@@ -325,7 +320,7 @@
                                 <span class="career-card__category">Direito Ambiental</span>
                             </div>
                             <h3>Gestão Ambiental Municipal</h3>
-                            <p>Atuação em Direito Ambiental Municipal - palestra em Viseu sobre politica municipal de residuos solidos</p>
+                            <p>Palestra em Viseu sobre política municipal de resíduos sólidos.</p>
                         </figcaption>
                     </figure>
                 </div>
@@ -455,9 +450,9 @@
                 <div class="accessibility__font-control">
                     <span>Tamanho do texto</span>
                     <div>
-                        <button type="button" aria-label="Diminuir texto" data-font-decrease>A−</button>
-                        <button type="button" aria-label="Restaurar tamanho do texto" data-font-reset>A</button>
-                        <button type="button" aria-label="Aumentar texto" data-font-increase>A+</button>
+                        <button type="button" aria-label="Diminuir texto" aria-pressed="false" data-font-decrease>A−</button>
+                        <button type="button" aria-label="Restaurar tamanho do texto" aria-pressed="true" data-font-reset>A</button>
+                        <button type="button" aria-label="Aumentar texto" aria-pressed="false" data-font-increase>A+</button>
                     </div>
                 </div>
 
@@ -466,7 +461,7 @@
                     Alto contraste
                 </button>
                 <button type="button" aria-pressed="false" data-links>
-                    <span class="accessibility__control-icon" aria-hidden="true">↗</span>
+                    <span class="accessibility__control-icon" aria-hidden="true">⌁</span>
                     Destacar links
                 </button>
                 <button type="button" aria-pressed="false" data-motion>
@@ -484,9 +479,10 @@
             aria-expanded="false"
             data-accessibility-trigger
         >
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-                <circle cx="12" cy="4.75" r="2.15"></circle>
-                <path d="M4.5 8.25c2.5 1.05 5 1.58 7.5 1.58s5-.53 7.5-1.58M12 10v4.25m0 0-3.25 6m3.25-6 3.25 6"></path>
+            <svg class="accessibility-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <circle class="accessibility-icon__ring" cx="12" cy="12" r="10"></circle>
+                <circle class="accessibility-icon__head" cx="12" cy="6.2" r="2"></circle>
+                <path d="M5.8 9.4c2 .9 4.1 1.35 6.2 1.35s4.2-.45 6.2-1.35M12 11v4.15m0 0-3 5.1m3-5.1 3 5.1"></path>
             </svg>
             <span>Acessibilidade</span>
         </button>

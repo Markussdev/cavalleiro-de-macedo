@@ -166,7 +166,7 @@ ol {
 }
 
 .button:hover span {
-    transform: translate(2px, -2px);
+    transform: translateY(3px);
 }
 
 .button--primary,
@@ -195,7 +195,7 @@ ol {
 }
 
 .text-link:hover span {
-    transform: translate(3px, -3px);
+    transform: translateY(3px);
 }
 
 /* Header */
@@ -514,6 +514,7 @@ ol {
     align-items: start;
     gap: 24px;
     padding: 45px 34px 40px;
+    transition: background-color var(--transition);
 }
 
 .highlight + .highlight {
@@ -540,7 +541,7 @@ ol {
     line-height: 1.7;
 }
 
-.highlight > a {
+.highlight__action {
     display: grid;
     width: 34px;
     height: 34px;
@@ -554,8 +555,12 @@ ol {
         transform var(--transition);
 }
 
-.highlight > a:hover {
-    transform: rotate(-45deg);
+.highlight:hover {
+    background: var(--color-surface-muted);
+}
+
+.highlight:hover .highlight__action {
+    transform: translateY(3px);
     background: var(--color-primary);
     color: var(--color-white);
 }
@@ -668,49 +673,15 @@ ol {
     background: var(--color-primary-soft);
 }
 
-.about__portrait-art::before {
-    position: absolute;
-    z-index: 1;
-    inset: 0;
-    background: linear-gradient(to top, rgba(16, 37, 33, 0.58), transparent 38%);
-    content: "";
-    pointer-events: none;
-}
-
 .about__portrait-art img {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center 18%;
+    object-position: 50% 18%;
     filter: saturate(0.88) contrast(1.03);
-}
-
-.about__portrait-ring {
-    position: absolute;
-    z-index: 2;
-    top: 25%;
-    left: 14%;
-    width: 72%;
-    aspect-ratio: 1;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    border-radius: 50%;
-    pointer-events: none;
-}
-
-.about__portrait-caption {
-    position: absolute;
-    z-index: 3;
-    right: 32px;
-    bottom: 30px;
-    color: rgba(255, 255, 255, 0.82);
-    font-size: 0.62rem;
-    letter-spacing: 0.15em;
-    line-height: 1.5;
-    text-align: right;
-    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.24);
-    text-transform: uppercase;
+    transform: scale(1.06);
 }
 
 .about__content h2 {
@@ -775,29 +746,40 @@ ol {
 
 /* Career */
 .career {
+    padding-block: clamp(88px, 8vw, 118px);
     background: var(--color-surface);
     border-bottom: 1px solid var(--color-border);
 }
 
+.career .section-heading {
+    margin-bottom: 42px;
+}
+
+.career .section-heading--split {
+    grid-template-columns: minmax(0, 0.9fr) minmax(320px, 0.7fr);
+}
+
 .career .section-heading h2 {
-    max-width: 740px;
+    max-width: 620px;
+}
+
+.career .section-heading > p {
+    max-width: 450px;
+    font-size: 0.95rem;
+    line-height: 1.7;
 }
 
 .career__gallery {
     display: grid;
-    grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: start;
-    gap: clamp(28px, 5vw, 64px);
-}
-
-.career-card--secondary {
-    margin-top: 165px;
+    gap: 24px;
 }
 
 .career-card__image {
     position: relative;
     overflow: hidden;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 16 / 10;
     border-radius: var(--radius-md);
     background: var(--color-surface-muted);
 }
@@ -815,23 +797,6 @@ ol {
 
 .career-card--secondary .career-card__image img {
     object-position: center;
-}
-
-.career-card__archive {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    padding: 8px 12px;
-    border: 1px solid rgba(255, 255, 255, 0.38);
-    border-radius: 999px;
-    background: rgba(16, 37, 33, 0.68);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    color: var(--color-white);
-    font-size: 0.62rem;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
 }
 
 .career-card figcaption {
@@ -859,20 +824,20 @@ ol {
 }
 
 .career-card h3 {
-    margin-top: 18px;
+    margin-top: 14px;
     font-family: var(--font-serif);
-    font-size: clamp(1.8rem, 3vw, 2.8rem);
+    font-size: clamp(1.8rem, 2.6vw, 2.45rem);
     font-weight: 400;
     letter-spacing: -0.025em;
     line-height: 1;
 }
 
 .career-card p {
-    max-width: 470px;
-    margin-top: 13px;
+    max-width: 520px;
+    margin-top: 12px;
     color: var(--color-text-muted);
-    font-size: 0.83rem;
-    line-height: 1.7;
+    font-size: 0.8rem;
+    line-height: 1.65;
 }
 
 /* Process */
@@ -1150,18 +1115,27 @@ ol {
     background: var(--color-primary);
     box-shadow: var(--shadow-floating);
     color: var(--color-white);
-    font-size: 0.7rem;
+    font-size: 0.78rem;
     font-weight: 600;
 }
 
-.accessibility__trigger svg {
-    width: 20px;
-    height: 20px;
+.accessibility-icon {
+    width: 24px;
+    height: 24px;
     fill: none;
     stroke: currentColor;
     stroke-linecap: round;
     stroke-linejoin: round;
-    stroke-width: 1.6;
+    stroke-width: 2;
+}
+
+.accessibility-icon__ring {
+    opacity: 0.5;
+}
+
+.accessibility-icon__head {
+    fill: currentColor;
+    stroke: none;
 }
 
 .accessibility__panel {
@@ -1189,7 +1163,7 @@ ol {
 
 .accessibility__header span {
     color: var(--color-accent-text);
-    font-size: 0.61rem;
+    font-size: 0.7rem;
     font-weight: 600;
     letter-spacing: 0.13em;
     text-transform: uppercase;
@@ -1230,7 +1204,7 @@ ol {
     border: 1px solid var(--color-border);
     border-radius: 12px;
     background: var(--color-background);
-    font-size: 0.68rem;
+    font-size: 0.8rem;
 }
 
 .accessibility__controls > button {
@@ -1265,7 +1239,7 @@ ol {
 }
 
 .accessibility__font-control > span {
-    font-size: 0.68rem;
+    font-size: 0.8rem;
     font-weight: 500;
 }
 
@@ -1281,8 +1255,18 @@ ol {
     border: 1px solid var(--color-border);
     border-radius: 7px;
     background: var(--color-surface);
-    font-size: 0.72rem;
+    font-size: 0.78rem;
     font-weight: 600;
+    transition:
+        background-color var(--transition),
+        border-color var(--transition),
+        color var(--transition);
+}
+
+.accessibility__font-control button[aria-pressed="true"] {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: var(--color-white);
 }
 
 /* JS reveal enhancement */
@@ -1417,10 +1401,6 @@ html.reduce-motion *::after {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .career-card--secondary {
-        margin-top: 110px;
-    }
-
     .about__grid {
         gap: 65px;
     }
@@ -1486,6 +1466,10 @@ html.reduce-motion *::after {
         gap: 27px;
     }
 
+    .career .section-heading--split {
+        grid-template-columns: 1fr;
+    }
+
     .section-heading {
         margin-bottom: 52px;
     }
@@ -1514,12 +1498,7 @@ html.reduce-motion *::after {
 
     .career__gallery {
         grid-template-columns: 1fr;
-    }
-
-    .career-card--secondary {
-        width: min(86%, 620px);
-        margin-top: 34px;
-        margin-left: auto;
+        gap: 48px;
     }
 
     .process__grid {
@@ -1608,12 +1587,8 @@ html.reduce-motion *::after {
     }
 
     .highlight {
-        grid-template-columns: auto 1fr;
+        grid-template-columns: auto 1fr auto;
         padding: 34px 4px;
-    }
-
-    .highlight > a {
-        display: none;
     }
 
     .practice-card {
@@ -1630,11 +1605,6 @@ html.reduce-motion *::after {
     .about__details div {
         grid-template-columns: 1fr;
         gap: 5px;
-    }
-
-    .career-card--secondary {
-        width: 100%;
-        margin-top: 28px;
     }
 
     .career-card__image {
