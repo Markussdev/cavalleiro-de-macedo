@@ -929,27 +929,6 @@ ol {
     line-height: 1.75;
 }
 
-.contact__availability {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    width: fit-content;
-    margin-top: 39px;
-    padding: 9px 15px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 999px;
-    color: rgba(255, 255, 255, 0.58);
-    font-size: 0.69rem;
-}
-
-.contact__availability > span {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--color-accent);
-    box-shadow: 0 0 0 4px rgba(197, 111, 71, 0.12);
-}
-
 .contact__channels {
     display: flex;
     flex-direction: column;
@@ -1102,6 +1081,19 @@ ol {
 .contact-card--secondary .contact-card__icon svg {
     width: 19px;
     height: 19px;
+}
+
+.contact-card--facebook .contact-card__icon svg {
+    width: 25px;
+    height: 25px;
+    fill: currentColor;
+    stroke: none;
+}
+
+.contact-card--secondary .contact-card__label {
+    font-size: 0.56rem;
+    letter-spacing: 0.11em;
+    white-space: nowrap;
 }
 
 .contact-card--secondary .contact-card__arrow {
