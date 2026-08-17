@@ -385,28 +385,72 @@
                     </span>
                 </div>
 
-                <div class="contact__links" data-reveal>
-                    <a href="#contato" data-placeholder-link>
-                        <span>
-                            <small>Mensagem direta</small>
-                            WhatsApp
+                <div class="contact__channels" data-reveal>
+                    <a
+                        class="contact-card contact-card--primary"
+                        href="#contato"
+                        data-placeholder-link
+                    >
+                        <span class="contact-card__icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M20.5 11.8a8.5 8.5 0 0 1-12.6 7.4L3 20.5l1.3-4.7a8.5 8.5 0 1 1 16.2-4Z"/>
+                                <path d="M8.4 7.8c.2-.4.4-.4.7-.4h.5c.2 0 .4.1.5.4l.8 1.9c.1.3.1.5-.1.7l-.6.7c-.2.2-.2.4-.1.6.6 1.2 1.6 2.2 2.8 2.8.2.1.4.1.6-.1l.8-.9c.2-.2.4-.3.7-.1l1.8.9c.3.1.4.3.4.5 0 .3-.1 1.2-.6 1.7-.5.5-1.3.8-2 .8-1.1 0-3.3-.6-5.4-2.5-1.7-1.5-2.8-3.4-3.1-4.7-.3-1.1 0-1.9.4-2.3Z"/>
+                            </svg>
                         </span>
-                        <span aria-hidden="true">↗</span>
-                    </a>
-                    <a href="#contato" data-placeholder-link>
-                        <span>
-                            <small>Redes sociais</small>
-                            Instagram
+
+                        <span class="contact-card__body">
+                            <span class="contact-card__label">Atendimento direto</span>
+                            <strong>Fale pelo WhatsApp</strong>
+                            <span class="contact-card__description">
+                                Inicie uma conversa diretamente com o escritório.
+                            </span>
                         </span>
-                        <span aria-hidden="true">↗</span>
+
+                        <span class="contact-card__arrow" aria-hidden="true">↗</span>
                     </a>
-                    <a href="#contato" data-placeholder-link>
-                        <span>
-                            <small>Contato profissional</small>
-                            E-mail
-                        </span>
-                        <span aria-hidden="true">↗</span>
-                    </a>
+
+                    <div class="contact__secondary">
+                        <a
+                            class="contact-card contact-card--secondary"
+                            href="#contato"
+                            data-placeholder-link
+                        >
+                            <span class="contact-card__icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24">
+                                    <rect x="3" y="5" width="18" height="14" rx="2"/>
+                                    <path d="m4 7 8 6 8-6"/>
+                                </svg>
+                            </span>
+
+                            <span class="contact-card__body">
+                                <span class="contact-card__label">Contato profissional</span>
+                                <strong>E-mail</strong>
+                            </span>
+
+                            <span class="contact-card__arrow" aria-hidden="true">↗</span>
+                        </a>
+
+                        <a
+                            class="contact-card contact-card--secondary"
+                            href="#contato"
+                            data-placeholder-link
+                        >
+                            <span class="contact-card__icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24">
+                                    <rect x="3" y="3" width="18" height="18" rx="5"/>
+                                    <circle cx="12" cy="12" r="4"/>
+                                    <circle cx="17.5" cy="6.5" r="1"/>
+                                </svg>
+                            </span>
+
+                            <span class="contact-card__body">
+                                <span class="contact-card__label">Redes sociais</span>
+                                <strong>Instagram</strong>
+                            </span>
+
+                            <span class="contact-card__arrow" aria-hidden="true">↗</span>
+                        </a>
+                    </div>
                 </div>
             </div>
 
@@ -417,27 +461,20 @@
     <footer class="footer">
         <div class="container">
             <div class="footer__top">
-                <div class="footer__identity">
-                    <a
-                        href="#inicio"
-                        class="brand brand--footer"
-                        aria-label="Cavalleiro de Macedo Advocacia — início"
-                    >
-                        <span class="brand__mark" aria-hidden="true">
-                            <img src="./assets/brand/cavalleiro-mark.svg" alt="">
-                        </span>
+                <a
+                    href="#inicio"
+                    class="brand brand--footer"
+                    aria-label="Cavalleiro de Macedo Advocacia — início"
+                >
+                    <span class="brand__mark" aria-hidden="true">
+                        <img src="./assets/brand/cavalleiro-mark.svg" alt="">
+                    </span>
 
-                        <span class="brand__identity">
-                            <strong class="brand__name">Cavalleiro de Macedo</strong>
-                            <span class="brand__subtitle">Advocacia</span>
-                        </span>
-                    </a>
-
-                    <p>
-                        Roberto Cavalleiro de Macedo
-                        <span>Bacharel em Direito · UFPA</span>
-                    </p>
-                </div>
+                    <span class="brand__identity">
+                        <strong class="brand__name">Cavalleiro de Macedo</strong>
+                        <span class="brand__subtitle">Advocacia</span>
+                    </span>
+                </a>
 
                 <a class="footer__back" href="#inicio">
                     Voltar ao início
@@ -445,8 +482,25 @@
                 </a>
             </div>
 
+            <div class="footer__navigation">
+                <nav aria-label="Navegação do rodapé">
+                    <span>Navegação</span>
+                    <a href="#atuacao">Atuação</a>
+                    <a href="#sobre">Sobre</a>
+                    <a href="#trajetoria">Trajetória</a>
+                    <a href="#atendimento">Atendimento</a>
+                </nav>
+
+                <div>
+                    <span>Contato</span>
+                    <a href="#contato">WhatsApp</a>
+                    <a href="#contato">Instagram</a>
+                    <a href="#contato">E-mail</a>
+                </div>
+            </div>
+
             <div class="footer__bottom">
-                <p>OAB/UF XXXXX</p>
+                <p>OAB/PA XXXXX</p>
                 <p>© <span data-year>2026</span> Cavalleiro de Macedo Advocacia</p>
                 <a href="#" data-placeholder-link>Política de privacidade</a>
                 <p class="footer__credit">Projeto por Marcus Vinícius</p>
