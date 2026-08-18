@@ -35,12 +35,15 @@ function createTextElement(tagName, className, text) {
 }
 
 function createPublicationCard(post, index) {
-    const article = document.createElement("article");
+    const article = document.createElement("a");
     const meta = document.createElement("div");
     const footer = document.createElement("div");
     const date = document.createElement("time");
+    const action = document.createElement("span");
 
     article.className = "publication-card";
+    article.href = `./publicacoes/artigo.html?slug=${encodeURIComponent(post.slug)}`;
+    article.setAttribute("aria-label", `Ler artigo: ${post.title}`);
     article.dataset.slug = post.slug;
 
     meta.className = "publication-card__meta";
@@ -61,10 +64,14 @@ function createPublicationCard(post, index) {
     footer.className = "publication-card__footer";
     date.dateTime = post.published_at || "";
     date.textContent = formatPostDate(post.published_at);
-    footer.append(
-        date,
-        createTextElement("span", "publication-card__rule", "")
+
+    action.className = "publication-card__action";
+    action.append(
+        "Ler artigo",
+        createTextElement("span", "", "→")
     );
+
+    footer.append(date, action);
 
     article.append(footer);
     return article;

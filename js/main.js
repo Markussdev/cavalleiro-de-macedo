@@ -96,7 +96,9 @@ document.querySelectorAll("[data-placeholder-link]").forEach((link) => {
     });
 });
 
-document.querySelector("[data-year]").textContent = new Date().getFullYear();
+document.querySelectorAll("[data-year]").forEach((element) => {
+    element.textContent = new Date().getFullYear();
+});
 
 // Accessibility controls
 const accessibilityPanel = document.querySelector("[data-accessibility-panel]");
