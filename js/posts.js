@@ -34,7 +34,7 @@ function createTextElement(tagName, className, text) {
     return element;
 }
 
-function createPublicationCard(post, index) {
+function createPublicationCard(post, index, articleBase) {
     const article = document.createElement("a");
     const meta = document.createElement("div");
     const footer = document.createElement("div");
@@ -42,7 +42,7 @@ function createPublicationCard(post, index) {
     const action = document.createElement("span");
 
     article.className = "publication-card";
-    article.href = `./publicacoes/artigo.html?slug=${encodeURIComponent(post.slug)}`;
+    article.href = `${articleBase}?slug=${encodeURIComponent(post.slug)}`;
     article.setAttribute("aria-label", `Ler artigo: ${post.title}`);
     article.dataset.slug = post.slug;
 
@@ -83,25 +83,31 @@ function showPostsStatus(grid, message) {
     grid.setAttribute("aria-busy", "false");
 }
 
-async function loadLatestPosts() {
-    const grid = document.querySelector("[data-posts-grid]");
-
-    if (!grid) {
-        return;
-    }
-
+async function fetchPublishedPosts(limit) {
     if (!window.supabaseClient) {
-        console.error("SUPABASE: cliente indisponível para carregar publicações.");
-        showPostsStatus(grid, "Não foi possível carregar as publicações agora.");
-        return;
+        return {
+            posts: null,
+            error: new Error("Cliente do Supabase indisponível.")
+        };
     }
 
-    const { data: posts, error } = await window.supabaseClient
+    let query = window.supabaseClient
         .from("posts")
         .select("title, slug, category, excerpt, published_at")
         .eq("published", true)
-        .order("published_at", { ascending: false, nullsFirst: false })
-        .limit(3);
+        .order("published_at", { ascending: false, nullsFirst: false });
+
+    if (Number.isInteger(limit) && limit > 0) {
+        query = query.limit(limit);
+    }
+
+    const { data: posts, error } = await query;
+    return { posts, error };
+}
+
+async function renderPublishedPosts(grid, limit) {
+    const articleBase = grid.dataset.articleBase || "./publicacoes/artigo.html";
+    const { posts, error } = await fetchPublishedPosts(limit);
 
     if (error) {
         console.error("Erro ao carregar publicações:", error);
@@ -114,9 +120,33 @@ async function loadLatestPosts() {
         return;
     }
 
-    const cards = posts.map((post, index) => createPublicationCard(post, index));
+    const cards = posts.map((post, index) => (
+        createPublicationCard(post, index, articleBase)
+    ));
     grid.replaceChildren(...cards);
     grid.setAttribute("aria-busy", "false");
 }
 
+function loadLatestPosts() {
+    const grid = document.querySelector("[data-latest-posts-grid]");
+
+    if (!grid) {
+        return;
+    }
+
+    const limit = Number.parseInt(grid.dataset.postsLimit, 10) || 3;
+    renderPublishedPosts(grid, limit);
+}
+
+function loadAllPosts() {
+    const grid = document.querySelector("[data-all-posts-grid]");
+
+    if (!grid) {
+        return;
+    }
+
+    renderPublishedPosts(grid);
+}
+
 loadLatestPosts();
+loadAllPosts();
