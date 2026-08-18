@@ -11,6 +11,10 @@ const contentEditor = document.querySelector("[data-post-content-editor]");
 const saveButton = document.querySelector("[data-save]");
 const primaryActionButton = document.querySelector("[data-primary-action]");
 
+const ARTICLE_IMAGES_BUCKET = "article-images";
+const ARTICLE_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const ARTICLE_IMAGE_MAX_SIZE = 5 * 1024 * 1024;
+
 const editorParams = new URLSearchParams(window.location.search);
 const rawPostId = editorParams.get("id");
 const postId = rawPostId && /^\d+$/.test(rawPostId)
@@ -28,13 +32,25 @@ const allowedContentTags = [
     "em",
     "blockquote",
     "a",
-    "br"
+    "br",
+    "img"
 ];
-const allowedContentAttributes = ["href", "target", "rel"];
+const allowedContentAttributes = [
+    "href",
+    "target",
+    "rel",
+    "src",
+    "alt",
+    "title",
+    "width",
+    "height",
+    "loading"
+];
 
 let currentPost = null;
 let quill = null;
 let editorIsSaving = false;
+let editorIsUploadingImage = false;
 let editorIsReady = false;
 let editorIsDirty = false;
 
@@ -72,9 +88,11 @@ function updateEditorActions() {
 
 function setEditorBusy(isBusy, action = "") {
     editorIsSaving = isBusy;
-    editorForm.setAttribute("aria-busy", String(isBusy));
-    saveButton.disabled = isBusy;
-    primaryActionButton.disabled = isBusy;
+    const editorIsBusy = isBusy || editorIsUploadingImage;
+
+    editorForm.setAttribute("aria-busy", String(editorIsBusy));
+    saveButton.disabled = editorIsBusy;
+    primaryActionButton.disabled = editorIsBusy;
 
     if (!isBusy) {
         updateEditorActions();
@@ -90,11 +108,171 @@ function setEditorBusy(isBusy, action = "") {
     }
 }
 
+function setImageUploadBusy(isBusy) {
+    editorIsUploadingImage = isBusy;
+    const editorIsBusy = isBusy || editorIsSaving;
+    const imageButton = document.querySelector("#editor-toolbar .ql-image");
+
+    editorForm.setAttribute("aria-busy", String(editorIsBusy));
+    saveButton.disabled = editorIsBusy;
+    primaryActionButton.disabled = editorIsBusy;
+
+    if (imageButton) {
+        imageButton.disabled = editorIsBusy;
+        imageButton.setAttribute("aria-busy", String(isBusy));
+    }
+}
+
 function sanitizeContent(html) {
     return window.DOMPurify.sanitize(html || "", {
         ALLOWED_TAGS: allowedContentTags,
         ALLOWED_ATTR: allowedContentAttributes
     });
+}
+
+function validateArticleImage(file) {
+    if (!ARTICLE_IMAGE_TYPES.includes(file.type)) {
+        return "Use uma imagem JPG, PNG ou WebP.";
+    }
+
+    if (!file.size) {
+        return "A imagem selecionada está vazia.";
+    }
+
+    if (file.size > ARTICLE_IMAGE_MAX_SIZE) {
+        return "A imagem deve ter no máximo 5 MB.";
+    }
+
+    return "";
+}
+
+function getFileExtension(file) {
+    const extensionsByType = {
+        "image/jpeg": "jpg",
+        "image/png": "png",
+        "image/webp": "webp"
+    };
+
+    return extensionsByType[file.type];
+}
+
+function createUniqueFileId() {
+    if (typeof window.crypto.randomUUID === "function") {
+        return window.crypto.randomUUID();
+    }
+
+    const randomValues = new Uint32Array(4);
+    window.crypto.getRandomValues(randomValues);
+    return Array.from(randomValues, (value) => value.toString(16)).join("-");
+}
+
+async function uploadArticleImage(file) {
+    const validationMessage = validateArticleImage(file);
+
+    if (validationMessage) {
+        throw new Error(validationMessage);
+    }
+
+    const {
+        data: { user },
+        error: userError
+    } = await window.supabaseClient.auth.getUser();
+
+    if (userError || !user) {
+        throw new Error("Sua sessão expirou. Entre novamente.");
+    }
+
+    const extension = getFileExtension(file);
+    const filePath = `${user.id}/${Date.now()}-${createUniqueFileId()}.${extension}`;
+    const storage = window.supabaseClient.storage.from(ARTICLE_IMAGES_BUCKET);
+    const { data, error } = await storage.upload(filePath, file, {
+        cacheControl: "31536000",
+        contentType: file.type,
+        upsert: false
+    });
+
+    if (error) {
+        throw error;
+    }
+
+    const { data: publicUrlData } = storage.getPublicUrl(data.path);
+
+    if (!publicUrlData?.publicUrl) {
+        throw new Error("Não foi possível gerar o endereço público da imagem.");
+    }
+
+    return {
+        path: data.path,
+        url: publicUrlData.publicUrl
+    };
+}
+
+async function insertArticleImage(file) {
+    const validationMessage = validateArticleImage(file);
+
+    if (validationMessage) {
+        setEditorStatus(validationMessage, "error");
+        return;
+    }
+
+    const altText = window.prompt(
+        "Descreva brevemente a imagem para pessoas que utilizam leitores de tela. Se ela for apenas decorativa, deixe em branco:",
+        ""
+    );
+
+    if (altText === null) {
+        return;
+    }
+
+    const range = quill.getSelection(true);
+    setImageUploadBusy(true);
+    setEditorStatus("Enviando imagem…");
+
+    try {
+        const { url } = await uploadArticleImage(file);
+
+        quill.insertEmbed(range.index, "image", url, "user");
+
+        const [imageBlot] = quill.getLeaf(range.index);
+        const imageElement = imageBlot?.domNode;
+
+        if (imageElement?.tagName === "IMG") {
+            imageElement.alt = altText.trim();
+            imageElement.loading = "lazy";
+        }
+
+        quill.setSelection(range.index + 1, 0, "silent");
+        editorIsDirty = true;
+        setEditorStatus("Imagem adicionada.", "success");
+    } catch (error) {
+        console.error("Erro ao enviar imagem:", error);
+        setEditorStatus(
+            error?.message || "Não foi possível enviar a imagem.",
+            "error"
+        );
+    } finally {
+        setImageUploadBusy(false);
+    }
+}
+
+function chooseArticleImage() {
+    if (editorIsSaving || editorIsUploadingImage) {
+        return;
+    }
+
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ARTICLE_IMAGE_TYPES.join(",");
+
+    input.addEventListener("change", async () => {
+        const file = input.files?.[0];
+
+        if (file) {
+            await insertArticleImage(file);
+        }
+    }, { once: true });
+
+    input.click();
 }
 
 function initializeRichEditor() {
@@ -114,9 +292,12 @@ function initializeRichEditor() {
             "italic",
             "list",
             "blockquote",
-            "link"
+            "link",
+            "image"
         ]
     });
+
+    quill.getModule("toolbar").addHandler("image", chooseArticleImage);
 
     const editableArea = contentEditor.querySelector(".ql-editor");
 
@@ -148,11 +329,13 @@ function setRichEditorContent(content) {
 
 function getRichEditorValues() {
     const plainContent = quill.getText().trim();
-    const content = plainContent
+    const hasImages = Boolean(contentEditor.querySelector(".ql-editor img"));
+    const hasContent = Boolean(plainContent || hasImages);
+    const content = hasContent
         ? sanitizeContent(quill.getSemanticHTML().trim())
         : "";
 
-    return { content, plainContent };
+    return { content, hasContent };
 }
 
 function createSlug(value) {
@@ -285,7 +468,7 @@ function validatePost(values, shouldPublish) {
         return "Escreva um resumo antes de publicar.";
     }
 
-    if (shouldPublish && !values.plainContent) {
+    if (shouldPublish && !values.hasContent) {
         return "Escreva o conteúdo antes de publicar.";
     }
 
@@ -420,7 +603,7 @@ function markEditorDirty() {
 });
 
 window.addEventListener("beforeunload", (event) => {
-    if (!editorIsDirty || editorIsSaving) {
+    if (!editorIsDirty && !editorIsUploadingImage) {
         return;
     }
 
@@ -431,7 +614,7 @@ window.addEventListener("beforeunload", (event) => {
 editorForm?.addEventListener("submit", (event) => {
     event.preventDefault();
 
-    if (editorIsSaving) {
+    if (editorIsSaving || editorIsUploadingImage) {
         return;
     }
 

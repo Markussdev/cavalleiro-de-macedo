@@ -1185,8 +1185,11 @@ ol {
 }
 
 .article-page__content img {
+    display: block;
     width: 100%;
+    max-width: 100%;
     height: auto;
+    margin: clamp(32px, 5vw, 56px) auto;
     border-radius: var(--radius-md);
 }
 

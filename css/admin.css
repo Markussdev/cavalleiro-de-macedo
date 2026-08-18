@@ -199,7 +199,8 @@ a {
     color: #a33c25;
 }
 
-.admin-panel__status[data-type="success"] {
+.admin-panel__status[data-type="success"],
+.admin-editor__status[data-type="success"] {
     color: var(--admin-green);
 }
 
@@ -605,6 +606,14 @@ a {
 
 .admin-rich-editor .ql-editor a {
     color: var(--admin-accent);
+}
+
+.admin-rich-editor .ql-editor img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 28px auto;
+    border-radius: 14px;
 }
 
 .admin-rich-editor:focus-within .ql-toolbar.ql-snow,
