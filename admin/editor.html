@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Editor de publicações de Cavalleiro de Macedo Advocacia.">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#18302d">
+
+    <link rel="icon" href="../assets/brand/cavalleiro-mark.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap"
+        rel="stylesheet"
+    >
+    <link rel="stylesheet" href="../css/admin.css">
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"
+        defer
+    ></script>
+    <script src="../js/supabase.js" defer></script>
+    <script src="../js/admin-editor.js" defer></script>
+
+    <title>Novo artigo | Cavalleiro de Macedo</title>
+</head>
+
+<body class="admin-body admin-body--panel">
+    <p class="admin-editor__loading" role="status" data-editor-loading>
+        Carregando editor…
+    </p>
+
+    <main class="admin-editor" hidden data-admin-editor>
+        <header class="admin-panel__header">
+            <a
+                class="admin-brand"
+                href="../index.html"
+                aria-label="Cavalleiro de Macedo Advocacia — abrir o site"
+            >
+                <img src="../assets/brand/cavalleiro-mark.svg" alt="">
+
+                <span>
+                    <strong>Cavalleiro de Macedo</strong>
+                    <small>Administração</small>
+                </span>
+            </a>
+
+            <a class="admin-editor__back" href="./painel.html">← Voltar ao painel</a>
+        </header>
+
+        <section class="admin-editor__heading" aria-labelledby="editor-title">
+            <span data-editor-eyebrow>Novo artigo</span>
+            <h1 id="editor-title" data-editor-title>Escrever publicação</h1>
+            <p>
+                Use HTML simples no conteúdo. A página pública fará a sanitização antes de exibir.
+            </p>
+        </section>
+
+        <form class="admin-editor__form" data-editor-form>
+            <label class="admin-field admin-field--wide" for="post-title">
+                <span>Título</span>
+                <input
+                    id="post-title"
+                    type="text"
+                    name="title"
+                    maxlength="180"
+                    autocomplete="off"
+                    required
+                    data-post-title
+                >
+            </label>
+
+            <label class="admin-field admin-field--compact" for="post-category">
+                <span>Categoria</span>
+                <select id="post-category" name="category" data-post-category>
+                    <option value="">Selecione uma categoria</option>
+                    <option value="Direito Ambiental">Direito Ambiental</option>
+                    <option value="Direito Civil">Direito Civil</option>
+                    <option value="Direito do Trabalho">Direito do Trabalho</option>
+                    <option value="Direito Empresarial">Direito Empresarial</option>
+                    <option value="Direito do Consumidor">Direito do Consumidor</option>
+                    <option value="Outra área">Outra área</option>
+                </select>
+            </label>
+
+            <label class="admin-field admin-field--wide" for="post-excerpt">
+                <span>Resumo</span>
+                <textarea
+                    id="post-excerpt"
+                    name="excerpt"
+                    rows="4"
+                    maxlength="360"
+                    data-post-excerpt
+                ></textarea>
+                <small>Texto curto exibido nos cards e abaixo do título do artigo.</small>
+            </label>
+
+            <label class="admin-field admin-field--wide" for="post-content">
+                <span>Conteúdo em HTML</span>
+                <textarea
+                    id="post-content"
+                    name="content"
+                    rows="20"
+                    spellcheck="false"
+                    aria-describedby="content-help"
+                    data-post-content
+                ></textarea>
+                <small id="content-help">
+                    Você pode usar parágrafos, títulos, listas, links e citações.
+                </small>
+            </label>
+
+            <div class="admin-editor__footer admin-field--wide">
+                <p
+                    class="admin-editor__status"
+                    role="status"
+                    aria-live="polite"
+                    data-editor-status
+                ></p>
+
+                <div class="admin-editor__actions">
+                    <button
+                        class="admin-button admin-button--secondary"
+                        type="submit"
+                        value="draft"
+                        data-save-draft
+                    >
+                        Salvar rascunho
+                    </button>
+
+                    <button
+                        class="admin-button"
+                        type="submit"
+                        value="publish"
+                        data-publish
+                    >
+                        Publicar
+                    </button>
+                </div>
+            </div>
+        </form>
+    </main>
+
+    <noscript>
+        <p class="admin-noscript">Ative o JavaScript para usar o editor administrativo.</p>
+    </noscript>
+</body>
+</html>

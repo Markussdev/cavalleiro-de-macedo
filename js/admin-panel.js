@@ -30,7 +30,7 @@ function createAdminPost(post) {
     const content = document.createElement("div");
     const meta = document.createElement("p");
     const title = document.createElement("h3");
-    const action = document.createElement("span");
+    const action = document.createElement("a");
 
     article.className = "admin-post";
     content.className = "admin-post__content";
@@ -41,10 +41,10 @@ function createAdminPost(post) {
     const dateLabel = post.published ? "Publicado em" : "Atualizado em";
     meta.textContent = `${post.category || "Sem categoria"} · ${dateLabel} ${formatAdminDate(dateValue)}`;
 
-    action.className = "admin-post__action admin-post__action--disabled";
-    action.textContent = "Editar em breve";
-    action.setAttribute("aria-disabled", "true");
-    action.title = "Edição de artigos será adicionada na próxima etapa";
+    action.className = "admin-post__action";
+    action.href = `./editor.html?id=${encodeURIComponent(post.id)}`;
+    action.textContent = "Editar →";
+    action.setAttribute("aria-label", `Editar artigo: ${post.title}`);
 
     content.append(title, meta);
     article.append(content, action);
@@ -130,7 +130,17 @@ async function loadAdminPanel() {
         "Nenhum rascunho no momento."
     );
 
-    panelStatus.textContent = "";
+    const savedState = new URLSearchParams(window.location.search).get("salvo");
+
+    if (savedState === "rascunho") {
+        panelStatus.textContent = "Rascunho salvo com sucesso.";
+        panelStatus.dataset.type = "success";
+    } else if (savedState === "publicado") {
+        panelStatus.textContent = "Artigo publicado com sucesso.";
+        panelStatus.dataset.type = "success";
+    } else {
+        panelStatus.textContent = "";
+    }
 }
 
 logoutButton?.addEventListener("click", async () => {
