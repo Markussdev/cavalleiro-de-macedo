@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Painel administrativo de Cavalleiro de Macedo Advocacia.">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#18302d">
+
+    <link rel="icon" href="../assets/brand/cavalleiro-mark.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap"
+        rel="stylesheet"
+    >
+    <link rel="stylesheet" href="../css/admin.css">
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"
+        defer
+    ></script>
+    <script src="../js/supabase.js" defer></script>
+    <script src="../js/admin-panel.js" defer></script>
+
+    <title>Painel | Cavalleiro de Macedo</title>
+</head>
+
+<body class="admin-body admin-body--panel">
+    <main class="admin-panel" hidden data-admin-panel>
+        <header class="admin-panel__header">
+            <a
+                class="admin-brand"
+                href="../index.html"
+                aria-label="Cavalleiro de Macedo Advocacia — abrir o site"
+            >
+                <img src="../assets/brand/cavalleiro-mark.svg" alt="">
+
+                <span>
+                    <strong>Cavalleiro de Macedo</strong>
+                    <small>Administração</small>
+                </span>
+            </a>
+
+            <button class="admin-logout" type="button" data-logout>
+                Sair
+            </button>
+        </header>
+
+        <section class="admin-panel__intro" aria-labelledby="panel-title">
+            <div>
+                <span>Painel administrativo</span>
+                <h1 id="panel-title">Olá, <span data-admin-name>Roberto</span>.</h1>
+                <p>Acompanhe os artigos publicados e os rascunhos do escritório.</p>
+            </div>
+
+            <span
+                class="admin-button admin-button--disabled"
+                aria-disabled="true"
+                title="Criação de artigos será adicionada na próxima etapa"
+            >
+                Novo artigo <span aria-hidden="true">＋</span>
+            </span>
+        </section>
+
+        <p class="admin-panel__status" role="status" aria-live="polite" data-panel-status>
+            Carregando publicações…
+        </p>
+
+        <section class="admin-posts" aria-labelledby="published-title">
+            <div class="admin-posts__heading">
+                <h2 id="published-title">Publicados</h2>
+                <span data-published-count>0</span>
+            </div>
+
+            <div class="admin-posts__list" data-published-posts></div>
+        </section>
+
+        <section class="admin-posts" aria-labelledby="drafts-title">
+            <div class="admin-posts__heading">
+                <h2 id="drafts-title">Rascunhos</h2>
+                <span data-drafts-count>0</span>
+            </div>
+
+            <div class="admin-posts__list" data-draft-posts></div>
+        </section>
+    </main>
+
+    <noscript>
+        <p class="admin-noscript">Ative o JavaScript para acessar o painel administrativo.</p>
+    </noscript>
+</body>
+</html>

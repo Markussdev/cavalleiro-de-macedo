@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Área administrativa de Cavalleiro de Macedo Advocacia.">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#18302d">
+
+    <link rel="icon" href="../assets/brand/cavalleiro-mark.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap"
+        rel="stylesheet"
+    >
+    <link rel="stylesheet" href="../css/admin.css">
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"
+        defer
+    ></script>
+    <script src="../js/supabase.js" defer></script>
+    <script src="../js/admin-auth.js" defer></script>
+
+    <title>Área administrativa | Cavalleiro de Macedo</title>
+</head>
+
+<body class="admin-body">
+    <main class="admin-login">
+        <section class="admin-login__card" aria-labelledby="login-title">
+            <a
+                class="admin-brand"
+                href="../index.html"
+                aria-label="Cavalleiro de Macedo Advocacia — voltar ao site"
+            >
+                <img src="../assets/brand/cavalleiro-mark.svg" alt="">
+
+                <span>
+                    <strong>Cavalleiro de Macedo</strong>
+                    <small>Advocacia</small>
+                </span>
+            </a>
+
+            <div class="admin-login__heading">
+                <span>Administração</span>
+                <h1 id="login-title">Área administrativa</h1>
+                <p>Entre com as credenciais autorizadas para gerenciar as publicações.</p>
+            </div>
+
+            <form class="admin-form" data-login-form>
+                <label>
+                    <span>E-mail</span>
+                    <input
+                        type="email"
+                        name="email"
+                        autocomplete="email"
+                        inputmode="email"
+                        required
+                    >
+                </label>
+
+                <label>
+                    <span>Senha</span>
+                    <input
+                        type="password"
+                        name="password"
+                        autocomplete="current-password"
+                        required
+                    >
+                </label>
+
+                <button type="submit" data-login-submit>
+                    Entrar
+                </button>
+
+                <p
+                    class="admin-form__status"
+                    role="status"
+                    aria-live="polite"
+                    data-login-status
+                ></p>
+            </form>
+
+            <a class="admin-login__back" href="../index.html">← Voltar ao site</a>
+        </section>
+    </main>
+</body>
+</html>
