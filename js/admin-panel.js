@@ -30,24 +30,38 @@ function createAdminPost(post) {
     const content = document.createElement("div");
     const meta = document.createElement("p");
     const title = document.createElement("h3");
-    const action = document.createElement("a");
+    const actions = document.createElement("div");
+    const editAction = document.createElement("a");
 
     article.className = "admin-post";
     content.className = "admin-post__content";
     meta.className = "admin-post__meta";
+    actions.className = "admin-post__actions";
     title.textContent = post.title;
 
     const dateValue = post.published ? post.published_at : post.updated_at;
     const dateLabel = post.published ? "Publicado em" : "Atualizado em";
     meta.textContent = `${post.category || "Sem categoria"} · ${dateLabel} ${formatAdminDate(dateValue)}`;
 
-    action.className = "admin-post__action";
-    action.href = `./editor.html?id=${encodeURIComponent(post.id)}`;
-    action.textContent = "Editar →";
-    action.setAttribute("aria-label", `Editar artigo: ${post.title}`);
+    if (post.published && post.slug) {
+        const viewAction = document.createElement("a");
+        viewAction.className = "admin-post__action admin-post__action--view";
+        viewAction.href = `../publicacoes/artigo.html?slug=${encodeURIComponent(post.slug)}`;
+        viewAction.target = "_blank";
+        viewAction.rel = "noopener noreferrer";
+        viewAction.textContent = "Visualizar ↗";
+        viewAction.setAttribute("aria-label", `Visualizar artigo publicado: ${post.title}`);
+        actions.append(viewAction);
+    }
+
+    editAction.className = "admin-post__action";
+    editAction.href = `./editor.html?id=${encodeURIComponent(post.id)}`;
+    editAction.textContent = "Editar →";
+    editAction.setAttribute("aria-label", `Editar artigo: ${post.title}`);
+    actions.append(editAction);
 
     content.append(title, meta);
-    article.append(content, action);
+    article.append(content, actions);
     return article;
 }
 
@@ -137,6 +151,12 @@ async function loadAdminPanel() {
         panelStatus.dataset.type = "success";
     } else if (savedState === "publicado") {
         panelStatus.textContent = "Artigo publicado com sucesso.";
+        panelStatus.dataset.type = "success";
+    } else if (savedState === "alteracoes") {
+        panelStatus.textContent = "Alterações salvas com sucesso.";
+        panelStatus.dataset.type = "success";
+    } else if (savedState === "despublicado") {
+        panelStatus.textContent = "Artigo retirado do site e movido para os rascunhos.";
         panelStatus.dataset.type = "success";
     } else {
         panelStatus.textContent = "";

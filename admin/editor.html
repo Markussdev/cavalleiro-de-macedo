@@ -14,6 +14,12 @@
         href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap"
         rel="stylesheet"
     >
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css"
+        integrity="sha384-ecIckRi4QlKYya/FQUbBUjS4qp65jF/J87Guw5uzTbO1C1Jfa/6kYmd6dXUF6D7i"
+        crossorigin="anonymous"
+    >
     <link rel="stylesheet" href="../css/admin.css">
 
     <script
@@ -21,6 +27,18 @@
         defer
     ></script>
     <script src="../js/supabase.js" defer></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/dompurify@3.4.13/dist/purify.min.js"
+        integrity="sha384-ZuC+DIACqSIZTsp+7YF57cR5Y+6qXa7YFbEKdA/EHA/R0T+41dtorqucYl71Zp+t"
+        crossorigin="anonymous"
+        defer
+    ></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"
+        integrity="sha384-utBUCeG4SYaCm4m7GQZYr8Hy8Fpy3V4KGjBZaf4WTKOcwhCYpt/0PfeEe3HNlwx8"
+        crossorigin="anonymous"
+        defer
+    ></script>
     <script src="../js/admin-editor.js" defer></script>
 
     <title>Novo artigo | Cavalleiro de Macedo</title>
@@ -53,7 +71,7 @@
             <span data-editor-eyebrow>Novo artigo</span>
             <h1 id="editor-title" data-editor-title>Escrever publicação</h1>
             <p>
-                Use HTML simples no conteúdo. A página pública fará a sanitização antes de exibir.
+                Escreva e formate o conteúdo como em um editor de texto comum.
             </p>
         </section>
 
@@ -75,12 +93,15 @@
                 <span>Categoria</span>
                 <select id="post-category" name="category" data-post-category>
                     <option value="">Selecione uma categoria</option>
-                    <option value="Direito Ambiental">Direito Ambiental</option>
-                    <option value="Direito Civil">Direito Civil</option>
+                    <option value="Direito Público e Administrativo">Direito Público e Administrativo</option>
                     <option value="Direito do Trabalho">Direito do Trabalho</option>
-                    <option value="Direito Empresarial">Direito Empresarial</option>
+                    <option value="Direito Civil">Direito Civil</option>
                     <option value="Direito do Consumidor">Direito do Consumidor</option>
-                    <option value="Outra área">Outra área</option>
+                    <option value="Direito Bancário">Direito Bancário</option>
+                    <option value="Direito Ambiental">Direito Ambiental</option>
+                    <option value="Direito Constitucional">Direito Constitucional</option>
+                    <option value="Direito Imobiliário">Direito Imobiliário</option>
+                    <option value="Atuação Extrajudicial">Atuação Extrajudicial</option>
                 </select>
             </label>
 
@@ -96,20 +117,75 @@
                 <small>Texto curto exibido nos cards e abaixo do título do artigo.</small>
             </label>
 
-            <label class="admin-field admin-field--wide" for="post-content">
-                <span>Conteúdo em HTML</span>
-                <textarea
-                    id="post-content"
-                    name="content"
-                    rows="20"
-                    spellcheck="false"
-                    aria-describedby="content-help"
-                    data-post-content
-                ></textarea>
+            <div class="admin-field admin-field--wide">
+                <span id="post-content-label">Conteúdo</span>
+
+                <div class="admin-rich-editor">
+                    <div
+                        class="admin-editor__toolbar"
+                        id="editor-toolbar"
+                        role="toolbar"
+                        aria-label="Formatação do conteúdo"
+                    >
+                        <span class="ql-formats">
+                            <select
+                                class="ql-header"
+                                aria-label="Estilo do texto"
+                                title="Estilo do texto"
+                            >
+                                <option value="2">Título</option>
+                                <option value="3">Subtítulo</option>
+                                <option selected>Texto</option>
+                            </select>
+                        </span>
+
+                        <span class="ql-formats">
+                            <button class="ql-bold" type="button" aria-label="Negrito" title="Negrito"></button>
+                            <button class="ql-italic" type="button" aria-label="Itálico" title="Itálico"></button>
+                        </span>
+
+                        <span class="ql-formats">
+                            <button
+                                class="ql-list"
+                                type="button"
+                                value="ordered"
+                                aria-label="Lista numerada"
+                                title="Lista numerada"
+                            ></button>
+                            <button
+                                class="ql-list"
+                                type="button"
+                                value="bullet"
+                                aria-label="Lista com marcadores"
+                                title="Lista com marcadores"
+                            ></button>
+                        </span>
+
+                        <span class="ql-formats">
+                            <button class="ql-blockquote" type="button" aria-label="Citação" title="Citação"></button>
+                            <button class="ql-link" type="button" aria-label="Inserir link" title="Inserir link"></button>
+                        </span>
+
+                        <span class="ql-formats">
+                            <button
+                                class="ql-clean"
+                                type="button"
+                                aria-label="Remover formatação"
+                                title="Remover formatação"
+                            ></button>
+                        </span>
+                    </div>
+
+                    <div
+                        id="post-content-editor"
+                        data-post-content-editor
+                    ></div>
+                </div>
+
                 <small id="content-help">
-                    Você pode usar parágrafos, títulos, listas, links e citações.
+                    Use títulos, listas, citações e links para organizar o artigo.
                 </small>
-            </label>
+            </div>
 
             <div class="admin-editor__footer admin-field--wide">
                 <p
@@ -123,8 +199,8 @@
                     <button
                         class="admin-button admin-button--secondary"
                         type="submit"
-                        value="draft"
-                        data-save-draft
+                        value="save"
+                        data-save
                     >
                         Salvar rascunho
                     </button>
@@ -133,7 +209,7 @@
                         class="admin-button"
                         type="submit"
                         value="publish"
-                        data-publish
+                        data-primary-action
                     >
                         Publicar
                     </button>

@@ -7,9 +7,9 @@ const editorTitle = document.querySelector("[data-editor-title]");
 const titleInput = document.querySelector("[data-post-title]");
 const categoryInput = document.querySelector("[data-post-category]");
 const excerptInput = document.querySelector("[data-post-excerpt]");
-const contentInput = document.querySelector("[data-post-content]");
-const draftButton = document.querySelector("[data-save-draft]");
-const publishButton = document.querySelector("[data-publish]");
+const contentEditor = document.querySelector("[data-post-content-editor]");
+const saveButton = document.querySelector("[data-save]");
+const primaryActionButton = document.querySelector("[data-primary-action]");
 
 const editorParams = new URLSearchParams(window.location.search);
 const rawPostId = editorParams.get("id");
@@ -17,26 +17,142 @@ const postId = rawPostId && /^\d+$/.test(rawPostId)
     ? Number.parseInt(rawPostId, 10)
     : null;
 
+const allowedContentTags = [
+    "p",
+    "h2",
+    "h3",
+    "ul",
+    "ol",
+    "li",
+    "strong",
+    "em",
+    "blockquote",
+    "a",
+    "br"
+];
+const allowedContentAttributes = ["href", "target", "rel"];
+
 let currentPost = null;
+let quill = null;
 let editorIsSaving = false;
+let editorIsReady = false;
+let editorIsDirty = false;
 
 function setEditorStatus(message, type = "") {
     editorStatus.textContent = message;
     editorStatus.dataset.type = type;
 }
 
+function getEditorState() {
+    if (!currentPost) {
+        return "new";
+    }
+
+    return currentPost.published ? "published" : "draft";
+}
+
+function updateEditorActions() {
+    const editorState = getEditorState();
+
+    saveButton.textContent = editorState === "new"
+        ? "Salvar rascunho"
+        : "Salvar alterações";
+
+    primaryActionButton.classList.toggle(
+        "admin-button--danger",
+        editorState === "published"
+    );
+    primaryActionButton.value = editorState === "published"
+        ? "unpublish"
+        : "publish";
+    primaryActionButton.textContent = editorState === "published"
+        ? "Despublicar"
+        : "Publicar";
+}
+
 function setEditorBusy(isBusy, action = "") {
     editorIsSaving = isBusy;
     editorForm.setAttribute("aria-busy", String(isBusy));
-    draftButton.disabled = isBusy;
-    publishButton.disabled = isBusy;
+    saveButton.disabled = isBusy;
+    primaryActionButton.disabled = isBusy;
 
-    draftButton.textContent = isBusy && action === "draft"
-        ? "Salvando…"
-        : "Salvar rascunho";
-    publishButton.textContent = isBusy && action === "publish"
-        ? "Publicando…"
-        : "Publicar";
+    if (!isBusy) {
+        updateEditorActions();
+        return;
+    }
+
+    if (action === "save") {
+        saveButton.textContent = "Salvando…";
+    } else if (action === "publish") {
+        primaryActionButton.textContent = "Publicando…";
+    } else if (action === "unpublish") {
+        primaryActionButton.textContent = "Despublicando…";
+    }
+}
+
+function sanitizeContent(html) {
+    return window.DOMPurify.sanitize(html || "", {
+        ALLOWED_TAGS: allowedContentTags,
+        ALLOWED_ATTR: allowedContentAttributes
+    });
+}
+
+function initializeRichEditor() {
+    if (!window.Quill || !window.DOMPurify || !contentEditor) {
+        return false;
+    }
+
+    quill = new window.Quill(contentEditor, {
+        theme: "snow",
+        placeholder: "Comece a escrever o artigo…",
+        modules: {
+            toolbar: "#editor-toolbar"
+        },
+        formats: [
+            "header",
+            "bold",
+            "italic",
+            "list",
+            "blockquote",
+            "link"
+        ]
+    });
+
+    const editableArea = contentEditor.querySelector(".ql-editor");
+
+    editableArea?.setAttribute("aria-labelledby", "post-content-label");
+    editableArea?.setAttribute("aria-describedby", "content-help");
+    editableArea?.setAttribute("role", "textbox");
+    editableArea?.setAttribute("aria-multiline", "true");
+
+    quill.on("text-change", (_delta, _oldDelta, source) => {
+        if (editorIsReady && source === "user") {
+            editorIsDirty = true;
+        }
+    });
+
+    return true;
+}
+
+function setRichEditorContent(content) {
+    const safeContent = sanitizeContent(content);
+
+    if (safeContent.trim()) {
+        quill.clipboard.dangerouslyPasteHTML(safeContent, "api");
+    } else {
+        quill.setText("", "api");
+    }
+
+    quill.getModule("history")?.clear();
+}
+
+function getRichEditorValues() {
+    const plainContent = quill.getText().trim();
+    const content = plainContent
+        ? sanitizeContent(quill.getSemanticHTML().trim())
+        : "";
+
+    return { content, plainContent };
 }
 
 function createSlug(value) {
@@ -121,11 +237,12 @@ function fillEditor(post) {
     addCurrentCategory(post.category);
     categoryInput.value = post.category || "";
     excerptInput.value = post.excerpt || "";
-    contentInput.value = post.content || "";
+    setRichEditorContent(post.content || "");
 
     editorEyebrow.textContent = post.published ? "Artigo publicado" : "Editar rascunho";
     editorTitle.textContent = "Editar publicação";
     document.title = `Editar ${post.title} | Cavalleiro de Macedo`;
+    updateEditorActions();
 }
 
 function showEditorError(message) {
@@ -168,20 +285,67 @@ function validatePost(values, shouldPublish) {
         return "Escreva um resumo antes de publicar.";
     }
 
-    if (shouldPublish && !values.content) {
+    if (shouldPublish && !values.plainContent) {
         return "Escreva o conteúdo antes de publicar.";
     }
 
     return "";
 }
 
+function getNextPublishedState(action) {
+    if (action === "publish") {
+        return true;
+    }
+
+    if (action === "unpublish") {
+        return false;
+    }
+
+    return Boolean(currentPost?.published);
+}
+
+function getRedirectState(action) {
+    if (action === "publish") {
+        return "publicado";
+    }
+
+    if (action === "unpublish") {
+        return "despublicado";
+    }
+
+    return currentPost ? "alteracoes" : "rascunho";
+}
+
+function getSavingMessage(action) {
+    if (action === "publish") {
+        return "Publicando artigo…";
+    }
+
+    if (action === "unpublish") {
+        return "Retirando publicação do site…";
+    }
+
+    return currentPost ? "Salvando alterações…" : "Salvando rascunho…";
+}
+
 async function savePost(action) {
-    const shouldPublish = action === "publish";
+    if (action === "unpublish") {
+        const confirmed = window.confirm(
+            "Deseja retirar esta publicação do site? Ela voltará para os rascunhos."
+        );
+
+        if (!confirmed) {
+            return;
+        }
+    }
+
+    const shouldPublish = getNextPublishedState(action);
+    const richEditorValues = getRichEditorValues();
     const values = {
         title: titleInput.value.trim(),
         category: categoryInput.value.trim(),
         excerpt: excerptInput.value.trim(),
-        content: contentInput.value.trim()
+        ...richEditorValues
     };
     const validationMessage = validatePost(values, shouldPublish);
 
@@ -191,7 +355,7 @@ async function savePost(action) {
     }
 
     setEditorBusy(true, action);
-    setEditorStatus(shouldPublish ? "Publicando artigo…" : "Salvando rascunho…");
+    setEditorStatus(getSavingMessage(action));
 
     try {
         const now = new Date().toISOString();
@@ -199,7 +363,7 @@ async function savePost(action) {
             title: values.title,
             category: values.category || null,
             excerpt: values.excerpt || null,
-            content: values.content || "",
+            content: values.content,
             published: shouldPublish,
             published_at: shouldPublish
                 ? currentPost?.published_at || now
@@ -229,9 +393,8 @@ async function savePost(action) {
             throw result.error || new Error("A publicação não foi salva.");
         }
 
-        window.location.replace(
-            `./painel.html?salvo=${shouldPublish ? "publicado" : "rascunho"}`
-        );
+        editorIsDirty = false;
+        window.location.replace(`./painel.html?salvo=${getRedirectState(action)}`);
     } catch (error) {
         console.error("Erro ao salvar publicação:", error);
 
@@ -245,6 +408,26 @@ async function savePost(action) {
     }
 }
 
+function markEditorDirty() {
+    if (editorIsReady) {
+        editorIsDirty = true;
+    }
+}
+
+[titleInput, categoryInput, excerptInput].forEach((field) => {
+    field?.addEventListener("input", markEditorDirty);
+    field?.addEventListener("change", markEditorDirty);
+});
+
+window.addEventListener("beforeunload", (event) => {
+    if (!editorIsDirty || editorIsSaving) {
+        return;
+    }
+
+    event.preventDefault();
+    event.returnValue = "";
+});
+
 editorForm?.addEventListener("submit", (event) => {
     event.preventDefault();
 
@@ -252,7 +435,11 @@ editorForm?.addEventListener("submit", (event) => {
         return;
     }
 
-    const action = event.submitter?.value === "publish" ? "publish" : "draft";
+    const submittedAction = event.submitter?.value;
+    const action = ["save", "publish", "unpublish"].includes(submittedAction)
+        ? submittedAction
+        : "save";
+
     savePost(action);
 });
 
@@ -269,16 +456,26 @@ async function initializeEditor() {
         return;
     }
 
+    if (!initializeRichEditor()) {
+        showEditorError("Não foi possível carregar o editor de texto agora.");
+        return;
+    }
+
     if (postId) {
         const loaded = await loadExistingPost();
 
         if (!loaded) {
             return;
         }
+    } else {
+        updateEditorActions();
     }
 
     editorLoading.hidden = true;
     editor.hidden = false;
+    quill.update("silent");
+    editorIsReady = true;
+    editorIsDirty = false;
     titleInput.focus();
 }
 

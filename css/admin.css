@@ -349,6 +349,17 @@ a {
     color: var(--admin-accent);
 }
 
+.admin-post__actions {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 18px;
+}
+
+.admin-post__action--view {
+    color: var(--admin-green);
+}
+
 .admin-posts__empty {
     padding: 25px 0;
     border-bottom: 1px solid var(--admin-border);
@@ -465,13 +476,6 @@ a {
     resize: vertical;
 }
 
-.admin-field [data-post-content] {
-    min-height: 440px;
-    font-family: Consolas, "Courier New", monospace;
-    font-size: 0.82rem;
-    tab-size: 4;
-}
-
 .admin-field input:focus,
 .admin-field select:focus,
 .admin-field textarea:focus {
@@ -483,6 +487,129 @@ a {
     color: var(--admin-muted);
     font-size: 0.68rem;
     line-height: 1.5;
+}
+
+.admin-rich-editor {
+    width: 100%;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.admin-editor__toolbar.ql-toolbar.ql-snow {
+    display: flex;
+    align-items: center;
+    min-height: 52px;
+    padding: 9px 12px;
+    overflow-x: auto;
+    border: 1px solid var(--admin-border);
+    border-radius: 8px 8px 0 0;
+    background: #f8f6f0;
+    font-family: var(--admin-sans);
+    scrollbar-width: thin;
+}
+
+.admin-editor__toolbar.ql-toolbar.ql-snow .ql-formats {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    margin-right: 12px;
+}
+
+.admin-editor__toolbar.ql-toolbar.ql-snow button,
+.admin-editor__toolbar.ql-toolbar.ql-snow .ql-picker-label {
+    border-radius: 4px;
+}
+
+.admin-editor__toolbar.ql-toolbar.ql-snow button:hover,
+.admin-editor__toolbar.ql-toolbar.ql-snow button:focus,
+.admin-editor__toolbar.ql-toolbar.ql-snow .ql-picker-label:hover,
+.admin-editor__toolbar.ql-toolbar.ql-snow .ql-picker-label:focus {
+    background: rgba(24, 58, 53, 0.08);
+}
+
+.admin-editor__toolbar.ql-snow .ql-stroke {
+    stroke: var(--admin-green);
+}
+
+.admin-editor__toolbar.ql-snow .ql-fill {
+    fill: var(--admin-green);
+}
+
+.admin-editor__toolbar.ql-snow .ql-picker {
+    color: var(--admin-green);
+}
+
+.admin-editor__toolbar .ql-picker.ql-header .ql-picker-label::before,
+.admin-editor__toolbar .ql-picker.ql-header .ql-picker-item::before {
+    content: "Texto";
+}
+
+.admin-editor__toolbar .ql-picker.ql-header .ql-picker-label[data-value="2"]::before,
+.admin-editor__toolbar .ql-picker.ql-header .ql-picker-item[data-value="2"]::before {
+    content: "Título";
+}
+
+.admin-editor__toolbar .ql-picker.ql-header .ql-picker-label[data-value="3"]::before,
+.admin-editor__toolbar .ql-picker.ql-header .ql-picker-item[data-value="3"]::before {
+    content: "Subtítulo";
+}
+
+.admin-rich-editor .ql-container.ql-snow {
+    min-height: 440px;
+    border: 1px solid var(--admin-border);
+    border-top: 0;
+    border-radius: 0 0 8px 8px;
+    color: var(--admin-text);
+    font-family: var(--admin-sans);
+    font-size: 0.95rem;
+}
+
+.admin-rich-editor .ql-editor {
+    min-height: 440px;
+    padding: 24px;
+    line-height: 1.8;
+}
+
+.admin-rich-editor .ql-editor.ql-blank::before {
+    right: 24px;
+    left: 24px;
+    color: rgba(104, 113, 109, 0.7);
+    font-style: normal;
+}
+
+.admin-rich-editor .ql-editor h2,
+.admin-rich-editor .ql-editor h3 {
+    margin: 1.45em 0 0.45em;
+    font-family: var(--admin-serif);
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    line-height: 1.12;
+}
+
+.admin-rich-editor .ql-editor h2 {
+    font-size: 2rem;
+}
+
+.admin-rich-editor .ql-editor h3 {
+    font-size: 1.55rem;
+}
+
+.admin-rich-editor .ql-editor blockquote {
+    margin: 1.4em 0;
+    padding: 8px 0 8px 20px;
+    border-left: 2px solid var(--admin-accent);
+    color: var(--admin-muted);
+    font-family: var(--admin-serif);
+    font-size: 1.25rem;
+}
+
+.admin-rich-editor .ql-editor a {
+    color: var(--admin-accent);
+}
+
+.admin-rich-editor:focus-within .ql-toolbar.ql-snow,
+.admin-rich-editor:focus-within .ql-container.ql-snow {
+    border-color: var(--admin-green);
 }
 
 .admin-editor__footer {
@@ -518,6 +645,17 @@ a {
     background: var(--admin-green);
 }
 
+.admin-button--danger {
+    border: 1px solid #a33c25;
+    color: #a33c25;
+    background: transparent;
+}
+
+.admin-button--danger:hover {
+    color: #fff;
+    background: #a33c25;
+}
+
 @media (max-width: 700px) {
     .admin-panel__header {
         min-height: 82px;
@@ -537,6 +675,11 @@ a {
         align-items: flex-start;
         flex-direction: column;
         gap: 12px;
+    }
+
+    .admin-post__actions {
+        width: 100%;
+        justify-content: flex-start;
     }
 
     .admin-editor__form {
