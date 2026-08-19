@@ -33,7 +33,9 @@ const allowedContentTags = [
     "blockquote",
     "a",
     "br",
-    "img"
+    "img",
+    "figure",
+    "figcaption"
 ];
 const allowedContentAttributes = [
     "href",
@@ -53,6 +55,7 @@ let editorIsSaving = false;
 let editorIsUploadingImage = false;
 let editorIsReady = false;
 let editorIsDirty = false;
+let articleImageBlotRegistered = false;
 
 function setEditorStatus(message, type = "") {
     editorStatus.textContent = message;
@@ -128,6 +131,68 @@ function sanitizeContent(html) {
         ALLOWED_TAGS: allowedContentTags,
         ALLOWED_ATTR: allowedContentAttributes
     });
+}
+
+function normalizeEditorHtml(html) {
+    const template = document.createElement("template");
+    template.innerHTML = html;
+
+    const walker = document.createTreeWalker(
+        template.content,
+        NodeFilter.SHOW_TEXT
+    );
+    let node;
+
+    while ((node = walker.nextNode())) {
+        node.nodeValue = node.nodeValue.replace(/\u00a0/g, " ");
+    }
+
+    return template.innerHTML;
+}
+
+function registerArticleImageBlot() {
+    if (articleImageBlotRegistered) {
+        return;
+    }
+
+    const BlockEmbed = window.Quill.import("blots/block/embed");
+
+    class ArticleImageBlot extends BlockEmbed {
+        static blotName = "articleImage";
+        static tagName = "figure";
+
+        static create(value) {
+            const figure = super.create();
+            const image = document.createElement("img");
+
+            image.src = value?.url || "";
+            image.alt = value?.alt || "";
+            image.loading = "lazy";
+            figure.append(image);
+
+            if (value?.caption?.trim()) {
+                const caption = document.createElement("figcaption");
+                caption.textContent = value.caption.trim();
+                figure.append(caption);
+            }
+
+            return figure;
+        }
+
+        static value(figure) {
+            const image = figure.querySelector("img");
+            const caption = figure.querySelector("figcaption");
+
+            return {
+                url: image?.getAttribute("src") || "",
+                alt: image?.getAttribute("alt") || "",
+                caption: caption?.textContent || ""
+            };
+        }
+    }
+
+    window.Quill.register(ArticleImageBlot);
+    articleImageBlotRegistered = true;
 }
 
 function validateArticleImage(file) {
@@ -216,11 +281,20 @@ async function insertArticleImage(file) {
     }
 
     const altText = window.prompt(
-        "Descreva brevemente a imagem para pessoas que utilizam leitores de tela. Se ela for apenas decorativa, deixe em branco:",
+        "Descreva brevemente o que aparece na imagem para acessibilidade:",
         ""
     );
 
     if (altText === null) {
+        return;
+    }
+
+    const caption = window.prompt(
+        "Digite uma legenda visível para a imagem. Se não quiser legenda, deixe em branco:",
+        ""
+    );
+
+    if (caption === null) {
         return;
     }
 
@@ -231,15 +305,11 @@ async function insertArticleImage(file) {
     try {
         const { url } = await uploadArticleImage(file);
 
-        quill.insertEmbed(range.index, "image", url, "user");
-
-        const [imageBlot] = quill.getLeaf(range.index);
-        const imageElement = imageBlot?.domNode;
-
-        if (imageElement?.tagName === "IMG") {
-            imageElement.alt = altText.trim();
-            imageElement.loading = "lazy";
-        }
+        quill.insertEmbed(range.index, "articleImage", {
+            url,
+            alt: altText.trim(),
+            caption: caption.trim()
+        }, "user");
 
         quill.setSelection(range.index + 1, 0, "silent");
         editorIsDirty = true;
@@ -280,6 +350,8 @@ function initializeRichEditor() {
         return false;
     }
 
+    registerArticleImageBlot();
+
     quill = new window.Quill(contentEditor, {
         theme: "snow",
         placeholder: "Comece a escrever o artigo…",
@@ -293,7 +365,8 @@ function initializeRichEditor() {
             "list",
             "blockquote",
             "link",
-            "image"
+            "image",
+            "articleImage"
         ]
     });
 
@@ -316,7 +389,7 @@ function initializeRichEditor() {
 }
 
 function setRichEditorContent(content) {
-    const safeContent = sanitizeContent(content);
+    const safeContent = sanitizeContent(normalizeEditorHtml(content));
 
     if (safeContent.trim()) {
         quill.clipboard.dangerouslyPasteHTML(safeContent, "api");
@@ -331,8 +404,10 @@ function getRichEditorValues() {
     const plainContent = quill.getText().trim();
     const hasImages = Boolean(contentEditor.querySelector(".ql-editor img"));
     const hasContent = Boolean(plainContent || hasImages);
+    const rawHtml = quill.getSemanticHTML().trim();
+    const normalizedHtml = normalizeEditorHtml(rawHtml);
     const content = hasContent
-        ? sanitizeContent(quill.getSemanticHTML().trim())
+        ? sanitizeContent(normalizedHtml)
         : "";
 
     return { content, hasContent };

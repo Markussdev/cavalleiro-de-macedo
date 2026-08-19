@@ -616,6 +616,22 @@ a {
     border-radius: 14px;
 }
 
+.admin-rich-editor .ql-editor figure {
+    margin: 28px 0;
+}
+
+.admin-rich-editor .ql-editor figure img {
+    margin: 0 auto;
+}
+
+.admin-rich-editor .ql-editor figcaption {
+    margin-top: 10px;
+    color: var(--admin-muted);
+    font-size: 0.72rem;
+    line-height: 1.55;
+    text-align: center;
+}
+
 .admin-rich-editor:focus-within .ql-toolbar.ql-snow,
 .admin-rich-editor:focus-within .ql-container.ql-snow {
     border-color: var(--admin-green);
