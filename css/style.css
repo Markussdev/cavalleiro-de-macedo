@@ -439,8 +439,8 @@ ol {
 
 .hero-split__panel--realestate {
     bottom: 0;
-    height: 50%;
-    clip-path: polygon(0 18%, 100% 0, 100% 100%, 0 100%);
+    height: 58%;
+    clip-path: polygon(0 25%, 100% 0, 100% 100%, 0 100%);
 }
 
 .hero-split__panel > img {
@@ -455,12 +455,12 @@ ol {
 
 .hero-split__panel--legal > img {
     filter: saturate(0.78) contrast(1.02);
-    object-position: 62% 25%;
+    object-position: 60% center;
 }
 
 .hero-split__panel--realestate > img {
-    filter: saturate(0.7) contrast(0.96) brightness(0.9);
-    object-position: 50% 52%;
+    filter: saturate(0.82) contrast(0.98) brightness(0.96);
+    object-position: 50% 42%;
 }
 
 .hero-split__shade {
@@ -479,8 +479,8 @@ ol {
 .hero-split__panel--realestate .hero-split__shade {
     background: linear-gradient(
         180deg,
-        rgba(35, 47, 42, 0.18),
-        rgba(24, 48, 45, 0.68)
+        rgba(24, 48, 45, 0.04),
+        rgba(24, 48, 45, 0.38)
     );
 }
 
@@ -524,9 +524,10 @@ ol {
 }
 
 .hero-split__panel--realestate .hero-split__content {
-    right: 8%;
-    bottom: 10%;
-    text-align: right;
+    right: auto;
+    bottom: 9%;
+    left: 8%;
+    text-align: left;
 }
 
 @media (hover: hover) {
