@@ -414,75 +414,147 @@ ol {
     justify-self: end;
 }
 
-.hero__visual-frame {
+.hero-split {
     position: relative;
     overflow: hidden;
     aspect-ratio: 0.83;
     border-radius: 240px 240px var(--radius-lg) var(--radius-lg);
-    background:
-        linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-        var(--color-primary);
-    background-size: 44px 44px;
+    isolation: isolate;
+    background: var(--color-primary);
     box-shadow: 0 32px 70px rgba(24, 48, 45, 0.18);
 }
 
-.visual__label {
+.hero-split::after {
+    position: absolute;
+    z-index: 4;
+    inset: 0;
+    background: linear-gradient(
+        to bottom right,
+        transparent calc(50% - 0.7px),
+        rgba(255, 255, 255, 0.58) 50%,
+        transparent calc(50% + 0.7px)
+    );
+    content: "";
+    pointer-events: none;
+}
+
+.hero-split__panel {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+}
+
+.hero-split__panel--legal {
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
+.hero-split__panel--realestate {
+    clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+
+.hero-split__panel > img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hero-split__panel--legal > img {
+    object-position: 68% center;
+}
+
+.hero-split__panel--realestate > img {
+    object-position: center;
+}
+
+.hero-split__shade {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        180deg,
+        rgba(8, 25, 22, 0.2),
+        rgba(8, 25, 22, 0.72)
+    );
+}
+
+.hero-split__content {
     position: absolute;
     z-index: 3;
-    top: 39px;
-    left: 50%;
-    transform: translateX(-50%);
-    color: rgba(255, 255, 255, 0.64);
-    font-size: 0.62rem;
-    letter-spacing: 0.19em;
+    color: var(--color-white);
+    text-shadow: 0 2px 18px rgba(8, 25, 22, 0.34);
+}
+
+.hero-split__content span {
+    display: block;
+    margin-bottom: 8px;
+    color: rgba(255, 255, 255, 0.68);
+    font-size: 0.58rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
-    white-space: nowrap;
 }
 
-.visual__orbit {
-    position: absolute;
-    top: 19%;
-    left: 13%;
-    width: 74%;
-    aspect-ratio: 1;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    border-radius: 50%;
+.hero-split__content strong {
+    display: block;
+    font-family: var(--font-serif);
+    font-size: clamp(2rem, 3vw, 3rem);
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    line-height: 0.95;
 }
 
-.visual__horse {
+.hero-split__content small {
+    display: block;
+    margin-top: 8px;
+    font-size: 0.66rem;
+    letter-spacing: 0.08em;
+}
+
+.hero-split__panel--legal .hero-split__content {
+    top: 16%;
+    left: 10%;
+}
+
+.hero-split__panel--realestate .hero-split__content {
+    right: 9%;
+    bottom: 12%;
+    text-align: right;
+}
+
+.hero-split__brand {
     position: absolute;
-    z-index: 3;
+    z-index: 5;
     top: 50%;
     left: 50%;
-    width: 43%;
-    transform: translate(-56%, -53%);
-    filter: brightness(0) invert(1);
-    opacity: 0.94;
-}
-
-.visual__disc {
-    position: absolute;
-    right: -14%;
-    bottom: -8%;
-    width: 61%;
-    aspect-ratio: 1;
+    display: grid;
+    width: 58px;
+    height: 58px;
+    transform: translate(-50%, -50%);
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.34);
     border-radius: 50%;
-    background: var(--color-accent);
+    background: rgba(24, 48, 45, 0.86);
+    box-shadow: 0 10px 24px rgba(8, 25, 22, 0.2);
+    backdrop-filter: blur(10px);
 }
 
-.visual__word {
-    position: absolute;
-    z-index: 2;
-    right: 26px;
-    bottom: 115px;
-    transform: rotate(-90deg) translateX(100%);
-    transform-origin: right bottom;
-    color: rgba(255, 255, 255, 0.72);
-    font-family: var(--font-serif);
-    font-size: 1.1rem;
-    letter-spacing: 0.13em;
-    text-transform: uppercase;
+.hero-split__brand img {
+    width: 28px;
+    filter: brightness(0) invert(1);
+}
+
+@media (hover: hover) {
+    .hero-split:hover .hero-split__panel > img {
+        transform: scale(1.035);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-split__panel > img {
+        transition: none;
+    }
 }
 
 /* Highlights */
@@ -2193,12 +2265,17 @@ html.reduce-motion *::after {
         margin-top: 48px;
     }
 
-    .hero__visual-frame {
+    .hero-split {
         border-radius: 180px 180px 26px 26px;
     }
 
-    .visual__label {
-        top: 31px;
+    .hero-split__brand {
+        width: 52px;
+        height: 52px;
+    }
+
+    .hero-split__brand img {
+        width: 25px;
     }
 
     .section {
