@@ -417,17 +417,21 @@ ol {
 .hero-composite {
     position: relative;
     width: 100%;
-    overflow: hidden;
-    aspect-ratio: 1.08;
-    border-radius: 220px 220px 28px 28px;
-    background: var(--color-primary);
-    box-shadow: 0 28px 60px rgba(24, 48, 45, 0.15);
+    overflow: visible;
+    aspect-ratio: 1.05;
     isolation: isolate;
 }
 
 .hero-composite__main {
     position: absolute;
-    inset: 0;
+    top: 0;
+    left: 0;
+    width: 88%;
+    height: 92%;
+    overflow: hidden;
+    border-radius: 190px 190px 28px 28px;
+    background: var(--color-primary);
+    box-shadow: 0 28px 60px rgba(24, 48, 45, 0.15);
 }
 
 .hero-composite__main > img,
@@ -439,41 +443,41 @@ ol {
 }
 
 .hero-composite__main > img {
-    object-position: 68% center;
-    filter: saturate(0.72) brightness(0.95);
+    object-position: 62% center;
+    filter: saturate(0.78) contrast(1.02) brightness(0.97);
 }
 
 .hero-composite__floating {
     position: absolute;
-    z-index: 2;
-    right: 24px;
-    bottom: 24px;
-    width: 34%;
-    height: 44%;
+    z-index: 4;
+    right: 0;
+    bottom: 0;
+    width: 39%;
+    height: 58%;
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.45);
-    border-radius: 28px;
+    border: 7px solid var(--color-background);
+    border-radius: 100px 100px 24px 24px;
     background: var(--color-surface);
-    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+    box-shadow: 0 24px 55px rgba(24, 48, 45, 0.2);
 }
 
 .hero-composite__floating > img {
-    object-position: center top;
-    filter: saturate(0.62) brightness(0.93);
+    object-position: 50% 32%;
+    filter: saturate(0.62) contrast(1.02) brightness(0.94);
 }
 
 .hero-composite__label {
     position: absolute;
-    z-index: 2;
+    z-index: 6;
     color: var(--color-white);
-    text-shadow: 0 2px 12px rgba(8, 25, 22, 0.65);
+    text-shadow: 0 2px 14px rgba(8, 25, 22, 0.45);
 }
 
 .hero-composite__label strong {
     display: block;
     margin-top: 4px;
     font-family: var(--font-serif);
-    font-size: 1.5rem;
+    font-size: 1.35rem;
     font-weight: 400;
     line-height: 1;
 }
@@ -481,8 +485,8 @@ ol {
 .hero-composite__label small,
 .hero-composite__label span {
     display: block;
-    font-size: 0.68rem;
-    letter-spacing: 0.08em;
+    font-size: 0.54rem;
+    letter-spacing: 0.12em;
 }
 
 .hero-composite__label small {
@@ -490,27 +494,44 @@ ol {
 }
 
 .hero-composite__label--main {
-    left: 34px;
-    bottom: 34px;
+    left: 26px;
+    bottom: 26px;
 }
 
 .hero-composite__label--floating {
-    right: 16px;
-    bottom: 16px;
-    left: 16px;
+    right: 18px;
+    bottom: 18px;
+    left: 18px;
+}
+
+.hero-composite__label--main small {
+    display: none;
+}
+
+.hero-composite__label--floating small {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.56rem;
+}
+
+.hero-composite__main::after,
+.hero-composite__floating::after {
+    position: absolute;
+    inset: 0;
+    content: "";
+    pointer-events: none;
+}
+
+.hero-composite__main::after {
+    background: linear-gradient(to top, rgba(15, 36, 32, 0.48), transparent 42%);
+}
+
+.hero-composite__floating::after {
+    background: linear-gradient(to top, rgba(15, 36, 32, 0.56), transparent 48%);
 }
 
 .hero-composite__accent-line {
-    position: absolute;
-    z-index: 3;
-    right: 160px;
-    bottom: 170px;
-    width: 220px;
-    height: 2px;
-    transform: rotate(-28deg);
-    transform-origin: center;
-    background: rgba(201, 118, 71, 0.95);
-    pointer-events: none;
+    display: none;
 }
 
 @media (hover: hover) {
@@ -2054,28 +2075,6 @@ html.reduce-motion *::after {
         font-size: clamp(3.4rem, 7vw, 5.3rem);
     }
 
-    .hero-composite__floating {
-        right: 20px;
-        bottom: 20px;
-        width: 36%;
-        height: 46%;
-    }
-
-    .hero-composite__label--floating {
-        right: 12px;
-        bottom: 12px;
-        left: 12px;
-    }
-
-    .hero-composite__label--floating strong {
-        font-size: 1.2rem;
-    }
-
-    .hero-composite__label--floating small,
-    .hero-composite__label--floating span {
-        font-size: 0.55rem;
-    }
-
     .section-heading--split {
         gap: 45px;
     }
@@ -2255,52 +2254,25 @@ html.reduce-motion *::after {
         margin-top: 48px;
     }
 
-    .hero-composite {
-        aspect-ratio: 0.94;
-    }
-
     .hero-composite__floating {
-        right: 16px;
-        bottom: 16px;
-        width: 39%;
-        height: 45%;
-        border-radius: 20px;
-    }
-
-    .hero-composite__label--main {
-        left: 24px;
-        bottom: 24px;
-    }
-
-    .hero-composite__label--main strong {
-        font-size: 1.3rem;
-    }
-
-    .hero-composite__label--main small,
-    .hero-composite__label--main span {
-        font-size: 0.58rem;
+        width: 41%;
+        height: 59%;
+        border-width: 5px;
+        border-radius: 80px 80px 20px 20px;
     }
 
     .hero-composite__label--floating {
-        right: 10px;
-        bottom: 10px;
-        left: 10px;
+        right: 12px;
+        bottom: 12px;
+        left: 12px;
     }
 
     .hero-composite__label--floating strong {
-        font-size: 1.05rem;
+        font-size: 1.1rem;
     }
 
-    .hero-composite__label--floating small,
-    .hero-composite__label--floating span {
-        font-size: 0.46rem;
-        letter-spacing: 0.05em;
-    }
-
-    .hero-composite__accent-line {
-        right: 104px;
-        bottom: 154px;
-        width: 166px;
+    .hero-composite__label--floating small {
+        font-size: 0.48rem;
     }
 
     .section {
