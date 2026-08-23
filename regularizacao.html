@@ -100,15 +100,41 @@
 
                         <label class="quick-field">
                             <span>Cidade / Município *</span>
-                            <input
-                                type="text"
-                                name="city"
-                                autocomplete="off"
-                                placeholder="Comece a digitar sua cidade"
-                                list="municipios-brasil"
-                                required
-                            >
-                            <datalist id="municipios-brasil"></datalist>
+                            <div class="city-autocomplete">
+                                <input
+                                    id="cityInput"
+                                    type="text"
+                                    name="city"
+                                    autocomplete="off"
+                                    placeholder="Comece a digitar sua cidade"
+                                    role="combobox"
+                                    aria-autocomplete="list"
+                                    aria-controls="cityDropdown"
+                                    aria-expanded="false"
+                                    required
+                                >
+
+                                <button
+                                    id="cityToggle"
+                                    class="city-toggle"
+                                    type="button"
+                                    aria-label="Abrir lista de cidades"
+                                    aria-controls="cityDropdown"
+                                    aria-expanded="false"
+                                >
+                                    <span aria-hidden="true">▾</span>
+                                </button>
+
+                                <div
+                                    id="cityDropdown"
+                                    class="city-dropdown"
+                                    role="listbox"
+                                    aria-label="Municípios brasileiros"
+                                    hidden
+                                >
+                                    <div id="cityOptions" class="city-options"></div>
+                                </div>
+                            </div>
                         </label>
 
                         <label class="quick-field">
