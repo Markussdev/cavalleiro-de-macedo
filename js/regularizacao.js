@@ -4,12 +4,15 @@ const cityInput = document.querySelector("#cityInput");
 const cityToggle = document.querySelector("#cityToggle");
 const cityDropdown = document.querySelector("#cityDropdown");
 const cityOptions = document.querySelector("#cityOptions");
+const whatsappInput = form?.elements.whatsapp;
 const cityIndex = new Map();
+const CITY_SEARCH_MIN_LENGTH = 2;
 let allCities = [];
 let citiesLoaded = false;
 let citiesRequest = null;
 let visibleCities = [];
 let activeCityIndex = -1;
+let formIsSubmitting = false;
 
 const normalizeCity = (value) => value
     .toString()
@@ -134,6 +137,12 @@ const renderCityOptions = (search = "") => {
     if (!cityOptions || !citiesLoaded) return;
 
     const normalizedSearch = normalizeCity(search);
+
+    if (normalizedSearch.length < CITY_SEARCH_MIN_LENGTH) {
+        setCityDropdown(false);
+        return;
+    }
+
     visibleCities = allCities
         .filter((city) => city.normalizedLabel.includes(normalizedSearch))
         .slice(0, 30);
@@ -187,8 +196,28 @@ const validateWhatsApp = (field) => {
     return isValid;
 };
 
-form?.addEventListener("submit", (event) => {
+const formatWhatsApp = (value) => {
+    const digits = value.replace(/\D/g, "").slice(0, 11);
+
+    if (digits.length <= 2) {
+        return digits;
+    }
+
+    if (digits.length <= 7) {
+        return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+    }
+
+    if (digits.length <= 10) {
+        return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+    }
+
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+};
+
+form?.addEventListener("submit", async (event) => {
     event.preventDefault();
+
+    if (formIsSubmitting) return;
 
     const whatsapp = form.elements.whatsapp;
     validateWhatsApp(whatsapp);
@@ -201,28 +230,67 @@ form?.addEventListener("submit", (event) => {
     }
 
     const formData = new FormData(form);
-    const data = {
+    const payload = {
         name: formData.get("name")?.trim(),
-        whatsapp: formData.get("whatsapp")?.trim(),
-        city: formData.get("city")?.trim() || null,
+        whatsapp: formData.get("whatsapp")?.replace(/\D/g, ""),
+        city: formData.get("city")?.trim(),
         request_type: formData.get("request_type"),
         privacy_consent: formData.get("privacy_consent") === "on"
     };
 
-    console.log("Novo lead jurídico:", data);
-    setStatus(
-        "Dados validados. O envio será conectado ao sistema na próxima etapa."
-    );
+    const submitButton = form.querySelector('[type="submit"]');
+    const originalButtonContent = submitButton?.innerHTML;
+
+    formIsSubmitting = true;
+    submitButton.disabled = true;
+    submitButton.textContent = "Enviando...";
+    setStatus("");
+
+    try {
+        if (!window.supabaseClient) {
+            throw new Error("Cliente do Supabase indisponível.");
+        }
+
+        const { error } = await window.supabaseClient
+            .from("legal_requests")
+            .insert(payload);
+
+        if (error) {
+            throw error;
+        }
+
+        form.reset();
+        cityInput?.setCustomValidity("");
+        setCityDropdown(false);
+        setStatus(
+            "Solicitação recebida. Entraremos em contato pelos dados informados."
+        );
+    } catch (error) {
+        console.error("Erro ao enviar solicitação:", error);
+        setStatus(
+            "Não foi possível enviar agora. Tente novamente em alguns instantes.",
+            true
+        );
+    } finally {
+        formIsSubmitting = false;
+        submitButton.disabled = false;
+        submitButton.innerHTML = originalButtonContent;
+    }
 });
 
-form?.elements.whatsapp?.addEventListener("input", (event) => {
+whatsappInput?.addEventListener("input", (event) => {
+    event.currentTarget.value = formatWhatsApp(event.currentTarget.value);
     event.currentTarget.setCustomValidity("");
 });
 
 cityInput?.addEventListener("focus", async () => {
     const loaded = await loadBrazilianCities();
 
-    if (loaded && document.activeElement === cityInput) {
+    if (
+        loaded
+        && document.activeElement === cityInput
+        && cityInput.value.trim().length >= CITY_SEARCH_MIN_LENGTH
+    ) {
         renderCityOptions(cityInput.value);
     }
 });
@@ -231,6 +299,12 @@ cityInput?.addEventListener("input", async () => {
     cityInput.setCustomValidity("");
 
     const typedValue = cityInput.value;
+
+    if (typedValue.trim().length < CITY_SEARCH_MIN_LENGTH) {
+        setCityDropdown(false);
+        return;
+    }
+
     const loaded = await loadBrazilianCities();
 
     if (loaded && document.activeElement === cityInput && cityInput.value === typedValue) {
@@ -260,6 +334,11 @@ cityInput?.addEventListener("keydown", async (event) => {
 
     if (!loaded) return;
 
+    if (cityInput.value.trim().length < CITY_SEARCH_MIN_LENGTH) {
+        setCityDropdown(false);
+        return;
+    }
+
     if (cityDropdown?.hidden) {
         renderCityOptions(cityInput.value);
     }
@@ -273,15 +352,23 @@ cityInput?.addEventListener("keydown", async (event) => {
 });
 
 cityToggle?.addEventListener("click", async () => {
+    const search = cityInput?.value.trim() || "";
+
     if (!cityDropdown?.hidden) {
         setCityDropdown(false);
+        return;
+    }
+
+    cityInput?.focus();
+
+    if (search.length < CITY_SEARCH_MIN_LENGTH) {
         return;
     }
 
     const loaded = await loadBrazilianCities();
 
     if (loaded) {
-        renderCityOptions(cityInput?.value || "");
+        renderCityOptions(search);
     }
 });
 

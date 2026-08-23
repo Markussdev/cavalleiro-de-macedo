@@ -19,6 +19,12 @@
         rel="stylesheet"
     >
     <link rel="stylesheet" href="./css/style.css">
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"
+        defer
+    ></script>
+    <script src="./js/supabase.js" defer></script>
+    <script src="./js/regularizacao.js" defer></script>
 </head>
 
 <body>
@@ -166,12 +172,15 @@
                             Solicitar contato
                             <span aria-hidden="true">→</span>
                         </button>
+
+                        <p class="quick-lead-form__privacy-note">
+                            Os dados serão utilizados apenas para retorno sobre esta solicitação.
+                        </p>
                     </form>
                 </div>
             </div>
         </section>
     </main>
 
-    <script src="./js/regularizacao.js"></script>
 </body>
 </html>
