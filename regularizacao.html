@@ -50,17 +50,20 @@
     <main id="conteudo">
         <section class="lead-capture" aria-labelledby="lead-title">
             <div class="container lead-capture__grid">
-                <div class="lead-capture__intro">
-                    <span class="eyebrow">Regularização de imóveis</span>
-                    <h1 id="lead-title">Orientação começa entendendo a sua situação.</h1>
-                    <p>
-                        Envie seus dados para um primeiro contato sobre documentação, contratos e
-                        regularização do imóvel.
-                    </p>
+                <div class="lead-capture__visual">
+                    <img
+                        src="./assets/images/hero-juridico-headroom.jpg"
+                        alt="Roberto Cavalleiro de Macedo em ambiente profissional"
+                        width="1870"
+                        height="841"
+                    >
 
-                    <div class="lead-capture__note">
-                        <span>01</span>
-                        <p>Preenchimento rápido.<br>Leva menos de 1 minuto.</p>
+                    <div class="lead-capture__visual-overlay"></div>
+
+                    <div class="lead-capture__visual-content">
+                        <span>Regularização de imóveis</span>
+                        <h1 id="lead-title">Atendimento direto.</h1>
+                        <p>Documentação · contratos · registros</p>
                     </div>
                 </div>
 
@@ -96,13 +99,16 @@
                         </label>
 
                         <label class="quick-field">
-                            <span>Cidade / Município</span>
+                            <span>Cidade / Município *</span>
                             <input
                                 type="text"
                                 name="city"
-                                autocomplete="address-level2"
-                                placeholder="Ex.: Belém"
+                                autocomplete="off"
+                                placeholder="Comece a digitar sua cidade"
+                                list="municipios-brasil"
+                                required
                             >
+                            <datalist id="municipios-brasil"></datalist>
                         </label>
 
                         <label class="quick-field">
