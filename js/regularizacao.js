@@ -28,26 +28,27 @@ form?.addEventListener("submit", (event) => {
 
     if (!form.checkValidity()) {
         form.reportValidity();
-        setStatus("Revise os campos obrigatórios antes de continuar.", true);
+        setStatus("Revise os campos obrigatórios.", true);
         return;
     }
 
     const formData = new FormData(form);
-    const data = Object.fromEntries(formData.entries());
+    const data = {
+        name: formData.get("name")?.trim(),
+        whatsapp: formData.get("whatsapp")?.trim(),
+        city: formData.get("city")?.trim() || null,
+        request_type: formData.get("request_type"),
+        privacy_consent: formData.get("privacy_consent") === "on"
+    };
 
-    data.name = data.name.trim();
-    data.whatsapp = data.whatsapp.trim();
-    data.email = data.email.trim();
-    data.city = data.city.trim();
-    data.description = data.description.trim();
-
-    console.log("Solicitação de regularização:", data);
-    setStatus("Formulário validado. Integração com o envio em configuração.");
+    console.log("Novo lead jurídico:", data);
+    setStatus(
+        "Dados validados. O envio será conectado ao sistema na próxima etapa."
+    );
 });
 
 form?.elements.whatsapp?.addEventListener("input", (event) => {
     event.currentTarget.setCustomValidity("");
-    setStatus("");
 });
 
 form?.addEventListener("input", () => setStatus(""));
