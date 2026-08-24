@@ -26,6 +26,8 @@ const statusLabels = {
     closed: "Concluída"
 };
 
+let legalRequests = [];
+
 const adminDateFormatter = new Intl.DateTimeFormat("pt-BR", {
     day: "2-digit",
     month: "2-digit",
@@ -92,6 +94,97 @@ function formatWhatsapp(value) {
     return value || "WhatsApp não informado";
 }
 
+function isKnownRequestStatus(status) {
+    return Object.prototype.hasOwnProperty.call(statusLabels, status);
+}
+
+function getRequestStatusKey(status) {
+    if (!status) {
+        return "new";
+    }
+
+    return isKnownRequestStatus(status) ? status : "unknown";
+}
+
+function setRequestStatusAppearance(element, value) {
+    const statusKey = getRequestStatusKey(value);
+    element.className = `admin-request__status admin-request__status--${statusKey}`;
+    element.textContent = statusKey === "unknown"
+        ? value
+        : statusLabels[statusKey];
+}
+
+function updateRequestsCount() {
+    const newRequests = legalRequests.filter(
+        (request) => getRequestStatusKey(request.status) === "new"
+    ).length;
+    const label = newRequests === 1 ? "1 nova" : `${newRequests} novas`;
+
+    requestsCount.textContent = label;
+    requestsCount.setAttribute(
+        "aria-label",
+        newRequests === 1
+            ? "1 solicitação nova"
+            : `${newRequests} solicitações novas`
+    );
+}
+
+async function updateLegalRequestStatus({
+    request,
+    nextStatus,
+    select,
+    status,
+    article,
+    feedback
+}) {
+    const previousStatus = request.status || "new";
+
+    if (nextStatus === previousStatus || !isKnownRequestStatus(nextStatus)) {
+        return;
+    }
+
+    request.status = nextStatus;
+    setRequestStatusAppearance(status, nextStatus);
+    updateRequestsCount();
+
+    select.disabled = true;
+    article.dataset.saving = "true";
+    feedback.textContent = "Salvando status…";
+    feedback.dataset.type = "pending";
+
+    try {
+        const { data: updatedRequest, error } = await window.supabaseClient
+            .from("legal_requests")
+            .update({ status: nextStatus })
+            .eq("id", request.id)
+            .select("id, status")
+            .maybeSingle();
+
+        if (error) {
+            throw error;
+        }
+
+        if (!updatedRequest || updatedRequest.status !== nextStatus) {
+            throw new Error("A solicitação não foi atualizada.");
+        }
+
+        request.status = updatedRequest.status;
+        feedback.textContent = "Status atualizado.";
+        feedback.dataset.type = "success";
+    } catch (error) {
+        console.error("Erro ao atualizar status da solicitação:", error);
+        request.status = previousStatus;
+        select.value = previousStatus;
+        setRequestStatusAppearance(status, previousStatus);
+        updateRequestsCount();
+        feedback.textContent = "Não foi possível salvar. Tente novamente.";
+        feedback.dataset.type = "error";
+    } finally {
+        select.disabled = false;
+        delete article.dataset.saving;
+    }
+}
+
 function createLegalRequest(request) {
     const article = document.createElement("article");
     const content = document.createElement("div");
@@ -102,13 +195,13 @@ function createLegalRequest(request) {
     const phone = document.createElement("strong");
     const date = document.createElement("time");
     const whatsapp = document.createElement("a");
+    const statusControl = document.createElement("div");
+    const statusField = document.createElement("label");
+    const statusCaption = document.createElement("span");
+    const statusSelect = document.createElement("select");
+    const statusFeedback = document.createElement("p");
 
     const rawStatus = request.status || "new";
-    const hasKnownStatus = Object.prototype.hasOwnProperty.call(
-        statusLabels,
-        rawStatus
-    );
-    const statusKey = hasKnownStatus ? rawStatus : "unknown";
     const requestType = requestLabels[request.request_type]
         || request.request_type
         || "Assunto não informado";
@@ -116,19 +209,44 @@ function createLegalRequest(request) {
 
     article.className = "admin-request";
     content.className = "admin-request__content";
-    status.className = `admin-request__status admin-request__status--${statusKey}`;
     contact.className = "admin-request__contact";
     phone.className = "admin-request__phone";
     date.className = "admin-request__date";
     whatsapp.className = "admin-request__action";
+    statusControl.className = "admin-request__status-control";
+    statusField.className = "admin-request__status-field";
+    statusSelect.className = "admin-request__status-select";
+    statusFeedback.className = "admin-request__status-feedback";
 
-    status.textContent = hasKnownStatus
-        ? statusLabels[rawStatus]
-        : rawStatus;
+    setRequestStatusAppearance(status, rawStatus);
     title.textContent = request.name || "Nome não informado";
     meta.textContent = `${request.city || "Cidade não informada"} · ${requestType}`;
     phone.textContent = formatWhatsapp(request.whatsapp);
     date.textContent = formatRequestDate(request.created_at);
+    statusCaption.textContent = "Status";
+    statusFeedback.setAttribute("role", "status");
+    statusFeedback.setAttribute("aria-live", "polite");
+
+    if (!isKnownRequestStatus(rawStatus)) {
+        const currentOption = document.createElement("option");
+        currentOption.value = rawStatus;
+        currentOption.textContent = rawStatus;
+        currentOption.disabled = true;
+        statusSelect.append(currentOption);
+    }
+
+    Object.entries(statusLabels).forEach(([value, label]) => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = label;
+        statusSelect.append(option);
+    });
+
+    statusSelect.value = rawStatus;
+    statusSelect.setAttribute(
+        "aria-label",
+        `Status da solicitação de ${request.name || "solicitante"}`
+    );
 
     if (request.created_at && !Number.isNaN(new Date(request.created_at).getTime())) {
         date.dateTime = request.created_at;
@@ -147,14 +265,28 @@ function createLegalRequest(request) {
         whatsapp.hidden = true;
     }
 
+    statusSelect.addEventListener("change", () => {
+        updateLegalRequestStatus({
+            request,
+            nextStatus: statusSelect.value,
+            select: statusSelect,
+            status,
+            article,
+            feedback: statusFeedback
+        });
+    });
+
     content.append(status, title, meta);
-    contact.append(phone, date, whatsapp);
+    statusField.append(statusCaption, statusSelect);
+    statusControl.append(statusField, statusFeedback);
+    contact.append(phone, date, whatsapp, statusControl);
     article.append(content, contact);
     return article;
 }
 
 function renderLegalRequests(requests) {
-    requestsCount.textContent = String(requests.length);
+    legalRequests = requests;
+    updateRequestsCount();
 
     if (!requests.length) {
         const empty = document.createElement("p");
@@ -171,7 +303,9 @@ function renderRequestsError() {
     const error = document.createElement("p");
     error.className = "admin-posts__empty admin-posts__empty--error";
     error.textContent = "Não foi possível carregar as solicitações agora.";
+    legalRequests = [];
     requestsCount.textContent = "—";
+    requestsCount.setAttribute("aria-label", "Não foi possível contar as solicitações novas");
     requestsList.replaceChildren(error);
 }
 

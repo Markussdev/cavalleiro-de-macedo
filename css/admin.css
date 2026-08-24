@@ -324,6 +324,13 @@ a {
     font-size: 0.68rem;
 }
 
+.admin-requests .admin-posts__heading > span {
+    min-width: 62px;
+    padding: 0 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
 .admin-post {
     display: flex;
     align-items: center;
@@ -389,6 +396,11 @@ a {
     border: 1px solid var(--admin-border);
     border-radius: 16px;
     background: var(--admin-surface);
+    transition: border-color 160ms ease, opacity 160ms ease;
+}
+
+.admin-request[data-saving="true"] {
+    border-color: rgba(24, 58, 53, 0.42);
 }
 
 .admin-request__content {
@@ -451,7 +463,7 @@ a {
 
 .admin-request__contact {
     display: grid;
-    min-width: 190px;
+    min-width: 220px;
     justify-items: end;
 }
 
@@ -485,6 +497,67 @@ a {
 .admin-request__action:hover {
     color: #fff;
     background: var(--admin-green);
+}
+
+.admin-request__status-control {
+    width: 100%;
+    margin-top: 20px;
+    padding-top: 17px;
+    border-top: 1px solid var(--admin-border);
+}
+
+.admin-request__status-field {
+    display: grid;
+    gap: 7px;
+}
+
+.admin-request__status-field > span {
+    color: var(--admin-muted);
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.admin-request__status-select {
+    width: 100%;
+    min-height: 42px;
+    padding: 0 12px;
+    border: 1px solid var(--admin-border);
+    border-radius: 8px;
+    outline: none;
+    color: var(--admin-text);
+    background: #fff;
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.72rem;
+    transition: border-color 160ms ease, box-shadow 160ms ease, opacity 160ms ease;
+}
+
+.admin-request__status-select:focus {
+    border-color: var(--admin-green);
+    box-shadow: 0 0 0 3px rgba(24, 58, 53, 0.1);
+}
+
+.admin-request__status-select:disabled {
+    cursor: wait;
+    opacity: 0.62;
+}
+
+.admin-request__status-feedback {
+    min-height: 16px;
+    margin: 6px 0 0;
+    color: var(--admin-muted);
+    font-size: 0.62rem;
+    line-height: 1.4;
+}
+
+.admin-request__status-feedback[data-type="success"] {
+    color: var(--admin-green);
+}
+
+.admin-request__status-feedback[data-type="error"] {
+    color: #a33c25;
 }
 
 .admin-noscript {
@@ -839,6 +912,7 @@ a {
     }
 
     .admin-request__contact {
+        width: 100%;
         justify-items: start;
     }
 
