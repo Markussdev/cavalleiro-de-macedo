@@ -185,43 +185,31 @@
                         tabindex="-1"
                         hidden
                     >
-                        <div class="lead-success__icon" aria-hidden="true">
-                            ✓
-                        </div>
+                        <div class="lead-success__notice">
+                            <span class="lead-success__check" aria-hidden="true">
+                                ✓
+                            </span>
 
-                        <span class="lead-success__eyebrow">
-                            Solicitação enviada
-                        </span>
+                            <div>
+                                <span>Solicitação enviada</span>
 
-                        <h2 id="lead-success-title">
-                            Recebemos seus dados.
-                        </h2>
-
-                        <p>
-                            As informações foram enviadas com sucesso.
-                            O contato será realizado pelo número informado
-                            na solicitação.
-                        </p>
-
-                        <div class="lead-success__details">
-                            <span>Próximo passo</span>
-
-                            <strong>
-                                Aguarde o retorno para dar continuidade
-                                ao atendimento.
-                            </strong>
+                                <p>
+                                    Seus dados foram recebidos com sucesso.
+                                </p>
+                            </div>
                         </div>
 
                         <div class="lead-upload" data-lead-upload>
                             <div class="lead-upload__header">
-                                <span>Opcional</span>
+                                <span>Etapa opcional</span>
 
-                                <h3>Quer adiantar a análise?</h3>
+                                <h2 id="lead-success-title">
+                                    Quer adiantar a análise?
+                                </h2>
 
                                 <p>
-                                    Você pode enviar escrituras, recibos,
-                                    contratos ou fotografias relacionadas
-                                    ao imóvel.
+                                    Envie escrituras, recibos, contratos
+                                    ou fotografias relacionadas ao imóvel.
                                 </p>
                             </div>
 
@@ -240,7 +228,7 @@
 
                                 <span class="lead-upload__icon" aria-hidden="true">+</span>
                                 <strong>Adicionar documentos</strong>
-                                <small>PDF, JPG, PNG ou WebP · até 10 MB por arquivo</small>
+                                <small>PDF, JPG, PNG ou WebP · até 10 MB</small>
                             </label>
 
                             <div
@@ -266,18 +254,20 @@
                             </button>
                         </div>
 
-                        <a class="button button--primary" href="./index.html">
-                            Voltar ao site
-                            <span aria-hidden="true">→</span>
-                        </a>
+                        <div class="lead-success__actions">
+                            <a class="text-link" href="./index.html">
+                                Voltar ao site
+                                <span aria-hidden="true">→</span>
+                            </a>
 
-                        <button
-                            class="lead-success__again"
-                            type="button"
-                            data-new-request
-                        >
-                            Enviar outra solicitação
-                        </button>
+                            <button
+                                class="lead-success__again"
+                                type="button"
+                                data-new-request
+                            >
+                                Nova solicitação
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

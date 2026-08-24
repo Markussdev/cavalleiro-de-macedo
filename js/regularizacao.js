@@ -4,6 +4,7 @@ const cityInput = document.querySelector("#cityInput");
 const cityToggle = document.querySelector("#cityToggle");
 const cityDropdown = document.querySelector("#cityDropdown");
 const cityOptions = document.querySelector("#cityOptions");
+const leadCard = document.querySelector(".lead-card");
 const leadHeader = document.querySelector(".lead-card__header");
 const leadSuccess = document.querySelector("[data-lead-success]");
 const newRequestButton = document.querySelector("[data-new-request]");
@@ -479,6 +480,8 @@ form?.addEventListener("submit", async (event) => {
             leadHeader.hidden = true;
         }
 
+        leadCard?.classList.add("lead-card--followup");
+
         if (leadSuccess) {
             leadSuccess.hidden = false;
             leadSuccess.focus();
@@ -726,6 +729,8 @@ newRequestButton?.addEventListener("click", () => {
     if (leadHeader) {
         leadHeader.hidden = false;
     }
+
+    leadCard?.classList.remove("lead-card--followup");
 
     form.hidden = false;
     form.elements.name?.focus();

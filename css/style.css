@@ -2762,11 +2762,10 @@ html.reduce-motion *::after {
 
 .lead-success {
     display: grid;
-    min-height: 500px;
-    align-content: center;
-    justify-items: center;
-    padding: 10px 0;
-    text-align: center;
+    width: 100%;
+    align-content: start;
+    justify-items: stretch;
+    text-align: left;
 }
 
 .lead-success[hidden] {
@@ -2775,74 +2774,6 @@ html.reduce-motion *::after {
 
 .lead-success:focus {
     outline: none;
-}
-
-.lead-success__icon {
-    display: grid;
-    width: 64px;
-    height: 64px;
-    place-items: center;
-    margin-bottom: 24px;
-    border: 1px solid rgba(197, 111, 71, 0.42);
-    border-radius: 50%;
-    background: rgba(197, 111, 71, 0.08);
-    color: var(--color-accent-text);
-    font-family: var(--font-serif);
-    font-size: 1.8rem;
-    line-height: 1;
-}
-
-.lead-success__eyebrow {
-    color: var(--color-accent-text);
-    font-size: 0.58rem;
-    font-weight: 600;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-}
-
-.lead-success h2 {
-    max-width: 380px;
-    margin-top: 13px;
-    font-family: var(--font-serif);
-    font-size: clamp(2.55rem, 4.5vw, 3.7rem);
-    font-weight: 400;
-    letter-spacing: -0.045em;
-    line-height: 0.95;
-}
-
-.lead-success > p {
-    max-width: 390px;
-    margin-top: 20px;
-    color: var(--color-text-muted);
-    font-size: 0.8rem;
-    line-height: 1.7;
-}
-
-.lead-success__details {
-    width: 100%;
-    margin: 30px 0;
-    padding: 24px 0;
-    border-top: 1px solid var(--color-border);
-    border-bottom: 1px solid var(--color-border);
-}
-
-.lead-success__details span {
-    display: block;
-    margin-bottom: 8px;
-    color: var(--color-accent-text);
-    font-size: 0.56rem;
-    font-weight: 600;
-    letter-spacing: 0.13em;
-    text-transform: uppercase;
-}
-
-.lead-success__details strong {
-    display: block;
-    max-width: 380px;
-    margin-inline: auto;
-    font-size: 0.78rem;
-    font-weight: 500;
-    line-height: 1.6;
 }
 
 /* Upload opcional de documentos jurídicos */
@@ -2864,7 +2795,7 @@ html.reduce-motion *::after {
     text-transform: uppercase;
 }
 
-.lead-upload__header h3 {
+.lead-upload__header h2 {
     margin-top: 8px;
     font-family: var(--font-serif);
     font-size: 1.7rem;
@@ -3022,13 +2953,9 @@ html.reduce-motion *::after {
     display: none;
 }
 
-.lead-success .button {
+.lead-success .lead-upload__button {
     width: 100%;
     justify-content: center;
-}
-
-.lead-success .button:hover span {
-    transform: translateX(3px);
 }
 
 .lead-success .lead-upload__button:hover span {
@@ -3036,15 +2963,15 @@ html.reduce-motion *::after {
 }
 
 .lead-success__again {
-    display: block;
-    margin: 18px auto 0;
+    margin: 0;
     border: 0;
-    border-bottom: 1px solid currentColor;
     background: transparent;
     color: var(--color-text-muted);
     cursor: pointer;
     font: inherit;
-    font-size: 0.68rem;
+    font-size: 0.64rem;
+    text-decoration: underline;
+    text-underline-offset: 4px;
     transition: color var(--transition);
 }
 
@@ -3055,6 +2982,92 @@ html.reduce-motion *::after {
 .lead-success__again:disabled {
     cursor: wait;
     opacity: 0.5;
+}
+
+/* ================================================================
+   Follow-up da solicitação
+   ================================================================ */
+
+.lead-card--followup {
+    align-self: center;
+    height: auto;
+    padding: 34px 38px;
+}
+
+.lead-card--followup .lead-success {
+    padding: 0;
+}
+
+.lead-success__notice {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    margin-bottom: 30px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.lead-success__check {
+    display: grid;
+    flex: 0 0 36px;
+    width: 36px;
+    height: 36px;
+    place-items: center;
+    border: 1px solid rgba(190, 83, 43, 0.38);
+    border-radius: 50%;
+    color: var(--color-accent-text);
+}
+
+.lead-success__notice div > span {
+    color: var(--color-accent-text);
+    font-size: 0.56rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.lead-success__notice p {
+    margin-top: 3px;
+    color: var(--color-text-muted);
+    font-size: 0.68rem;
+}
+
+.lead-card--followup .lead-upload {
+    margin: 0;
+}
+
+.lead-card--followup .lead-upload__header {
+    margin-bottom: 22px;
+}
+
+.lead-card--followup .lead-upload__header h2 {
+    max-width: 390px;
+    margin-top: 9px;
+    font-family: var(--font-serif);
+    font-size: clamp(2.6rem, 4vw, 3.6rem);
+    font-weight: 400;
+    letter-spacing: -0.045em;
+    line-height: 0.94;
+}
+
+.lead-card--followup .lead-upload__header p {
+    max-width: 390px;
+    margin-top: 13px;
+    line-height: 1.6;
+}
+
+.lead-card--followup .lead-upload__dropzone {
+    min-height: 130px;
+}
+
+.lead-success__actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid var(--color-border);
 }
 
 @media (max-width: 900px) {
@@ -3116,6 +3129,14 @@ html.reduce-motion *::after {
     .lead-card {
         padding: 26px 20px;
         border-radius: 22px;
+    }
+
+    .lead-card--followup {
+        padding: 28px 20px;
+    }
+
+    .lead-card--followup .lead-upload__header h2 {
+        font-size: clamp(2.35rem, 12vw, 3rem);
     }
 
     .lead-card__header h2 {
