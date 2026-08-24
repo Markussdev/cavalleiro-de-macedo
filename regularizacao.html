@@ -104,8 +104,8 @@
                             >
                         </label>
 
-                        <label class="quick-field">
-                            <span>Cidade / Município *</span>
+                        <div class="quick-field">
+                            <label for="cityInput">Cidade / Município *</label>
                             <div class="city-autocomplete">
                                 <input
                                     id="cityInput"
@@ -141,12 +141,12 @@
                                     <div id="cityOptions" class="city-options"></div>
                                 </div>
                             </div>
-                        </label>
+                        </div>
 
                         <label class="quick-field">
                             <span>Como podemos ajudar? *</span>
                             <select name="request_type" required>
-                                <option value="">Selecione uma opção</option>
+                                <option value="" disabled selected hidden>Selecione uma opção</option>
                                 <option value="regularizacao">Regularização de imóvel</option>
                                 <option value="escritura-registro">Escritura ou registro</option>
                                 <option value="compra-venda">Compra e venda</option>
@@ -177,6 +177,54 @@
                             Os dados serão utilizados apenas para retorno sobre esta solicitação.
                         </p>
                     </form>
+
+                    <div
+                        class="lead-success"
+                        data-lead-success
+                        aria-labelledby="lead-success-title"
+                        tabindex="-1"
+                        hidden
+                    >
+                        <div class="lead-success__icon" aria-hidden="true">
+                            ✓
+                        </div>
+
+                        <span class="lead-success__eyebrow">
+                            Solicitação enviada
+                        </span>
+
+                        <h2 id="lead-success-title">
+                            Recebemos seus dados.
+                        </h2>
+
+                        <p>
+                            As informações foram enviadas com sucesso.
+                            O contato será realizado pelo número informado
+                            na solicitação.
+                        </p>
+
+                        <div class="lead-success__details">
+                            <span>Próximo passo</span>
+
+                            <strong>
+                                Aguarde o retorno para dar continuidade
+                                ao atendimento.
+                            </strong>
+                        </div>
+
+                        <a class="button button--primary" href="./index.html">
+                            Voltar ao site
+                            <span aria-hidden="true">→</span>
+                        </a>
+
+                        <button
+                            class="lead-success__again"
+                            type="button"
+                            data-new-request
+                        >
+                            Enviar outra solicitação
+                        </button>
+                    </div>
                 </div>
             </div>
         </section>

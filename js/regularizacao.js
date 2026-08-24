@@ -4,6 +4,9 @@ const cityInput = document.querySelector("#cityInput");
 const cityToggle = document.querySelector("#cityToggle");
 const cityDropdown = document.querySelector("#cityDropdown");
 const cityOptions = document.querySelector("#cityOptions");
+const leadHeader = document.querySelector(".lead-card__header");
+const leadSuccess = document.querySelector("[data-lead-success]");
+const newRequestButton = document.querySelector("[data-new-request]");
 const whatsappInput = form?.elements.whatsapp;
 const cityIndex = new Map();
 const CITY_SEARCH_MIN_LENGTH = 2;
@@ -262,9 +265,18 @@ form?.addEventListener("submit", async (event) => {
         form.reset();
         cityInput?.setCustomValidity("");
         setCityDropdown(false);
-        setStatus(
-            "Solicitação recebida. Entraremos em contato pelos dados informados."
-        );
+        setStatus("");
+
+        form.hidden = true;
+
+        if (leadHeader) {
+            leadHeader.hidden = true;
+        }
+
+        if (leadSuccess) {
+            leadSuccess.hidden = false;
+            leadSuccess.focus();
+        }
     } catch (error) {
         console.error("Erro ao enviar solicitação:", error);
         setStatus(
@@ -379,3 +391,16 @@ document.addEventListener("click", (event) => {
 });
 
 form?.addEventListener("input", () => setStatus(""));
+
+newRequestButton?.addEventListener("click", () => {
+    if (leadSuccess) {
+        leadSuccess.hidden = true;
+    }
+
+    if (leadHeader) {
+        leadHeader.hidden = false;
+    }
+
+    form.hidden = false;
+    form.elements.name?.focus();
+});
