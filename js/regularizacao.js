@@ -7,15 +7,39 @@ const cityOptions = document.querySelector("#cityOptions");
 const leadHeader = document.querySelector(".lead-card__header");
 const leadSuccess = document.querySelector("[data-lead-success]");
 const newRequestButton = document.querySelector("[data-new-request]");
+const legalDocumentsInput = document.querySelector("[data-legal-documents]");
+const uploadDropzone = document.querySelector("[data-upload-dropzone]");
+const uploadFilesContainer = document.querySelector("[data-upload-files]");
+const uploadButton = document.querySelector("[data-upload-button]");
+const uploadStatus = document.querySelector("[data-upload-status]");
 const whatsappInput = form?.elements.whatsapp;
 const cityIndex = new Map();
 const CITY_SEARCH_MIN_LENGTH = 2;
+const MAX_FILES = 5;
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+const ALLOWED_FILE_TYPES = new Set([
+    "application/pdf",
+    "image/jpeg",
+    "image/png",
+    "image/webp"
+]);
+const FILE_EXTENSION_BY_TYPE = {
+    "application/pdf": "pdf",
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp"
+};
+const uploadButtonContent = uploadButton?.innerHTML;
 let allCities = [];
 let citiesLoaded = false;
 let citiesRequest = null;
 let visibleCities = [];
 let activeCityIndex = -1;
 let formIsSubmitting = false;
+let currentRequestId = null;
+let uploadedFilesCount = 0;
+let selectedLegalFiles = [];
+let uploadIsRunning = false;
 
 const normalizeCity = (value) => value
     .toString()
@@ -217,6 +241,183 @@ const formatWhatsApp = (value) => {
     return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
 };
 
+const createUuid = () => {
+    if (typeof window.crypto?.randomUUID === "function") {
+        return window.crypto.randomUUID();
+    }
+
+    const bytes = new Uint8Array(16);
+    window.crypto.getRandomValues(bytes);
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+
+    const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0"));
+    return [
+        hex.slice(0, 4).join(""),
+        hex.slice(4, 6).join(""),
+        hex.slice(6, 8).join(""),
+        hex.slice(8, 10).join(""),
+        hex.slice(10).join("")
+    ].join("-");
+};
+
+const setUploadStatus = (message, type = "") => {
+    if (!uploadStatus) return;
+
+    uploadStatus.textContent = message;
+
+    if (type) {
+        uploadStatus.dataset.type = type;
+    } else {
+        delete uploadStatus.dataset.type;
+    }
+};
+
+const formatFileSize = (bytes) => {
+    if (bytes < 1024) {
+        return `${bytes} B`;
+    }
+
+    if (bytes < 1024 * 1024) {
+        return `${(bytes / 1024).toFixed(1)} KB`;
+    }
+
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+};
+
+const validateLegalFile = (file) => {
+    if (!ALLOWED_FILE_TYPES.has(file.type)) {
+        return "Tipo de arquivo não permitido.";
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+        return "O arquivo ultrapassa 10 MB.";
+    }
+
+    if (file.size <= 0) {
+        return "O arquivo está vazio.";
+    }
+
+    return null;
+};
+
+const getFileSignature = (file) => (
+    `${file.name}:${file.size}:${file.type}:${file.lastModified}`
+);
+
+const renderSelectedLegalFiles = () => {
+    if (!uploadFilesContainer || !uploadButton) return;
+
+    uploadFilesContainer.replaceChildren();
+
+    selectedLegalFiles.forEach((file, index) => {
+        const row = document.createElement("div");
+        const info = document.createElement("div");
+        const name = document.createElement("strong");
+        const size = document.createElement("small");
+        const remove = document.createElement("button");
+
+        row.className = "lead-upload-file";
+        info.className = "lead-upload-file__info";
+        remove.className = "lead-upload-file__remove";
+        remove.type = "button";
+        remove.disabled = uploadIsRunning;
+
+        name.textContent = file.name;
+        size.textContent = formatFileSize(file.size);
+        remove.textContent = "Remover";
+        remove.setAttribute("aria-label", `Remover arquivo ${file.name}`);
+
+        remove.addEventListener("click", () => {
+            if (uploadIsRunning) return;
+
+            selectedLegalFiles.splice(index, 1);
+            setUploadStatus(
+                selectedLegalFiles.length
+                    ? `${selectedLegalFiles.length} arquivo(s) selecionado(s).`
+                    : ""
+            );
+            renderSelectedLegalFiles();
+        });
+
+        info.append(name, size);
+        row.append(info, remove);
+        uploadFilesContainer.append(row);
+    });
+
+    const uploadLimitReached = (
+        uploadedFilesCount + selectedLegalFiles.length >= MAX_FILES
+    );
+
+    uploadButton.hidden = selectedLegalFiles.length === 0;
+    uploadButton.disabled = uploadIsRunning;
+
+    if (legalDocumentsInput) {
+        legalDocumentsInput.disabled = uploadIsRunning || uploadLimitReached;
+    }
+
+    uploadDropzone?.classList.toggle(
+        "is-disabled",
+        uploadIsRunning || uploadLimitReached
+    );
+};
+
+const resetLegalUpload = ({ clearRequest = true } = {}) => {
+    if (clearRequest) {
+        currentRequestId = null;
+    }
+
+    uploadedFilesCount = 0;
+    selectedLegalFiles = [];
+    uploadIsRunning = false;
+
+    if (legalDocumentsInput) {
+        legalDocumentsInput.value = "";
+    }
+
+    if (newRequestButton) {
+        newRequestButton.disabled = false;
+    }
+
+    setUploadStatus("");
+    renderSelectedLegalFiles();
+};
+
+async function uploadLegalFile(file, requestId) {
+    const extension = FILE_EXTENSION_BY_TYPE[file.type];
+    const fileId = createUuid();
+    const storagePath = `${requestId}/${fileId}.${extension}`;
+
+    const { error: uploadError } = await window.supabaseClient
+        .storage
+        .from("legal-documents")
+        .upload(storagePath, file, {
+            cacheControl: "3600",
+            upsert: false,
+            contentType: file.type
+        });
+
+    if (uploadError) {
+        throw uploadError;
+    }
+
+    const { error: metadataError } = await window.supabaseClient
+        .from("legal_request_files")
+        .insert({
+            request_id: requestId,
+            storage_path: storagePath,
+            original_name: file.name,
+            mime_type: file.type,
+            size_bytes: file.size
+        });
+
+    if (metadataError) {
+        throw metadataError;
+    }
+
+    return storagePath;
+}
+
 form?.addEventListener("submit", async (event) => {
     event.preventDefault();
 
@@ -233,7 +434,9 @@ form?.addEventListener("submit", async (event) => {
     }
 
     const formData = new FormData(form);
+    const requestId = createUuid();
     const payload = {
+        id: requestId,
         name: formData.get("name")?.trim(),
         whatsapp: formData.get("whatsapp")?.replace(/\D/g, ""),
         city: formData.get("city")?.trim(),
@@ -261,6 +464,9 @@ form?.addEventListener("submit", async (event) => {
         if (error) {
             throw error;
         }
+
+        currentRequestId = requestId;
+        resetLegalUpload({ clearRequest: false });
 
         form.reset();
         cityInput?.setCustomValidity("");
@@ -392,7 +598,127 @@ document.addEventListener("click", (event) => {
 
 form?.addEventListener("input", () => setStatus(""));
 
+legalDocumentsInput?.addEventListener("change", () => {
+    if (!legalDocumentsInput.files || uploadIsRunning) return;
+
+    const incomingFiles = Array.from(legalDocumentsInput.files);
+    const selectedSignatures = new Set(selectedLegalFiles.map(getFileSignature));
+    const errors = [];
+
+    for (const file of incomingFiles) {
+        const validationError = validateLegalFile(file);
+
+        if (validationError) {
+            errors.push(`${file.name}: ${validationError}`);
+            continue;
+        }
+
+        const signature = getFileSignature(file);
+
+        if (selectedSignatures.has(signature)) {
+            errors.push(`${file.name}: este arquivo já foi selecionado.`);
+            continue;
+        }
+
+        if (selectedLegalFiles.length + uploadedFilesCount >= MAX_FILES) {
+            errors.push("Você pode enviar no máximo 5 arquivos.");
+            break;
+        }
+
+        selectedLegalFiles.push(file);
+        selectedSignatures.add(signature);
+    }
+
+    legalDocumentsInput.value = "";
+    renderSelectedLegalFiles();
+
+    if (errors.length) {
+        setUploadStatus(errors[0], "error");
+    } else if (selectedLegalFiles.length) {
+        setUploadStatus(
+            selectedLegalFiles.length === 1
+                ? "1 arquivo selecionado."
+                : `${selectedLegalFiles.length} arquivos selecionados.`
+        );
+    } else {
+        setUploadStatus("");
+    }
+});
+
+uploadButton?.addEventListener("click", async () => {
+    if (
+        uploadIsRunning
+        || !currentRequestId
+        || !selectedLegalFiles.length
+    ) {
+        return;
+    }
+
+    if (!window.supabaseClient) {
+        setUploadStatus("Não foi possível iniciar o envio agora.", "error");
+        return;
+    }
+
+    const requestId = currentRequestId;
+    const filesToUpload = [...selectedLegalFiles];
+    let uploaded = 0;
+
+    uploadIsRunning = true;
+
+    if (newRequestButton) {
+        newRequestButton.disabled = true;
+    }
+
+    renderSelectedLegalFiles();
+    uploadButton.textContent = "Enviando documentos...";
+    setUploadStatus(`Enviando 0 de ${filesToUpload.length}...`);
+
+    try {
+        for (const file of filesToUpload) {
+            await uploadLegalFile(file, requestId);
+
+            uploaded += 1;
+            uploadedFilesCount += 1;
+            selectedLegalFiles = selectedLegalFiles.filter(
+                (selectedFile) => selectedFile !== file
+            );
+
+            renderSelectedLegalFiles();
+            setUploadStatus(`Enviando ${uploaded} de ${filesToUpload.length}...`);
+        }
+
+        setUploadStatus(
+            uploaded === 1
+                ? "Documento enviado com sucesso."
+                : `${uploaded} documentos enviados com sucesso.`,
+            "success"
+        );
+    } catch (error) {
+        console.error("Erro ao enviar documento:", error);
+        setUploadStatus(
+            uploaded
+                ? `${uploaded} arquivo(s) enviado(s). Os demais não puderam ser enviados.`
+                : "Não foi possível enviar os documentos. Tente novamente.",
+            "error"
+        );
+    } finally {
+        uploadIsRunning = false;
+
+        if (newRequestButton) {
+            newRequestButton.disabled = false;
+        }
+
+        uploadButton.disabled = false;
+        uploadButton.innerHTML = uploadButtonContent;
+        renderSelectedLegalFiles();
+    }
+});
+
 newRequestButton?.addEventListener("click", () => {
+    if (uploadIsRunning) return;
+
+    resetLegalUpload();
+
     if (leadSuccess) {
         leadSuccess.hidden = true;
     }

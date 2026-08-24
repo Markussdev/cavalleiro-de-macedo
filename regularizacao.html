@@ -212,6 +212,60 @@
                             </strong>
                         </div>
 
+                        <div class="lead-upload" data-lead-upload>
+                            <div class="lead-upload__header">
+                                <span>Opcional</span>
+
+                                <h3>Quer adiantar a análise?</h3>
+
+                                <p>
+                                    Você pode enviar escrituras, recibos,
+                                    contratos ou fotografias relacionadas
+                                    ao imóvel.
+                                </p>
+                            </div>
+
+                            <label
+                                class="lead-upload__dropzone"
+                                for="legalDocuments"
+                                data-upload-dropzone
+                            >
+                                <input
+                                    id="legalDocuments"
+                                    type="file"
+                                    multiple
+                                    accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp"
+                                    data-legal-documents
+                                >
+
+                                <span class="lead-upload__icon" aria-hidden="true">+</span>
+                                <strong>Adicionar documentos</strong>
+                                <small>PDF, JPG, PNG ou WebP · até 10 MB por arquivo</small>
+                            </label>
+
+                            <div
+                                class="lead-upload__files"
+                                data-upload-files
+                                aria-live="polite"
+                            ></div>
+
+                            <p
+                                class="lead-upload__status"
+                                data-upload-status
+                                aria-live="polite"
+                            ></p>
+
+                            <button
+                                class="button button--primary lead-upload__button"
+                                type="button"
+                                data-upload-button
+                                hidden
+                            >
+                                Enviar documentos
+                                <span aria-hidden="true">↑</span>
+                            </button>
+                        </div>
+
                         <a class="button button--primary" href="./index.html">
                             Voltar ao site
                             <span aria-hidden="true">→</span>
