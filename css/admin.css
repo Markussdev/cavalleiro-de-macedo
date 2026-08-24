@@ -467,13 +467,35 @@ a {
 }
 
 .admin-request__files summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
     width: fit-content;
+    padding: 5px 0;
+    list-style: none;
     color: var(--admin-accent);
     cursor: pointer;
-    font-size: 0.65rem;
+    font-family: var(--admin-sans);
+    font-size: 0.78rem;
     font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    line-height: 1.4;
+    text-transform: none;
+}
+
+.admin-request__files summary::-webkit-details-marker {
+    display: none;
+}
+
+.admin-request__files summary::before {
+    display: inline-block;
+    color: var(--admin-accent);
+    content: "▸";
+    transition: transform 160ms ease;
+}
+
+.admin-request__files[open] summary::before {
+    transform: rotate(90deg);
 }
 
 .admin-request__files-list {
@@ -493,7 +515,8 @@ a {
     background: transparent;
     cursor: pointer;
     font: inherit;
-    font-size: 0.72rem;
+    font-size: 0.78rem;
+    line-height: 1.45;
     text-align: left;
     transition: color 160ms ease, opacity 160ms ease;
 }
@@ -609,6 +632,35 @@ a {
 
 .admin-request__status-feedback[data-type="error"] {
     color: #a33c25;
+}
+
+.admin-request__delete {
+    margin-top: 14px;
+    padding: 6px 0;
+    border: 0;
+    border-bottom: 1px solid transparent;
+    color: #9c4a38;
+    background: transparent;
+    cursor: pointer;
+    font-size: 0.66rem;
+    opacity: 0.72;
+    transition: opacity 160ms ease, border-color 160ms ease;
+}
+
+.admin-request__delete:hover {
+    border-color: currentColor;
+    opacity: 1;
+}
+
+.admin-request__delete:disabled {
+    cursor: wait;
+    opacity: 0.4;
+}
+
+.admin-request.is-removing {
+    transform: translateY(-5px);
+    opacity: 0;
+    transition: opacity 220ms ease, transform 220ms ease;
 }
 
 .admin-noscript {

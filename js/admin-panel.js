@@ -225,6 +225,74 @@ async function openLegalDocument(file, button) {
     }
 }
 
+async function deleteLegalRequest({ request, article, button }) {
+    const confirmed = window.confirm(
+        `Remover a solicitação de ${request.name || "este contato"}?\n\n`
+        + "Os documentos enviados também serão excluídos. "
+        + "Esta ação não pode ser desfeita."
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    const originalText = button.textContent;
+
+    button.disabled = true;
+    button.textContent = "Removendo…";
+    article.dataset.deleting = "true";
+
+    try {
+        const storagePaths = (request.files || [])
+            .map((file) => file.storage_path)
+            .filter(Boolean);
+
+        if (storagePaths.length) {
+            const { error: storageError } = await window.supabaseClient
+                .storage
+                .from("legal-documents")
+                .remove(storagePaths);
+
+            if (storageError) {
+                throw storageError;
+            }
+        }
+
+        const { data: deletedRequest, error: requestError } = await window.supabaseClient
+            .from("legal_requests")
+            .delete()
+            .eq("id", request.id)
+            .select("id")
+            .maybeSingle();
+
+        if (requestError) {
+            throw requestError;
+        }
+
+        if (!deletedRequest || deletedRequest.id !== request.id) {
+            throw new Error("A solicitação não foi removida.");
+        }
+
+        legalRequests = legalRequests.filter((item) => item.id !== request.id);
+        updateRequestsCount();
+        article.classList.add("is-removing");
+
+        window.setTimeout(() => {
+            article.remove();
+
+            if (!legalRequests.length) {
+                renderLegalRequests([]);
+            }
+        }, 220);
+    } catch (error) {
+        console.error("Erro ao remover solicitação:", error);
+        window.alert("Não foi possível remover a solicitação. Tente novamente.");
+        button.disabled = false;
+        button.textContent = originalText;
+        delete article.dataset.deleting;
+    }
+}
+
 function createRequestFiles(request) {
     const files = request.files || [];
 
@@ -279,6 +347,7 @@ function createLegalRequest(request) {
     const statusCaption = document.createElement("span");
     const statusSelect = document.createElement("select");
     const statusFeedback = document.createElement("p");
+    const deleteButton = document.createElement("button");
     const files = createRequestFiles(request);
 
     const rawStatus = request.status || "new";
@@ -297,6 +366,13 @@ function createLegalRequest(request) {
     statusField.className = "admin-request__status-field";
     statusSelect.className = "admin-request__status-select";
     statusFeedback.className = "admin-request__status-feedback";
+    deleteButton.type = "button";
+    deleteButton.className = "admin-request__delete";
+    deleteButton.textContent = "Remover solicitação";
+    deleteButton.setAttribute(
+        "aria-label",
+        `Remover solicitação de ${request.name || "solicitante"}`
+    );
 
     setRequestStatusAppearance(status, rawStatus);
     title.textContent = request.name || "Nome não informado";
@@ -356,6 +432,14 @@ function createLegalRequest(request) {
         });
     });
 
+    deleteButton.addEventListener("click", () => {
+        deleteLegalRequest({
+            request,
+            article,
+            button: deleteButton
+        });
+    });
+
     content.append(status, title, meta);
 
     if (files) {
@@ -364,7 +448,7 @@ function createLegalRequest(request) {
 
     statusField.append(statusCaption, statusSelect);
     statusControl.append(statusField, statusFeedback);
-    contact.append(phone, date, whatsapp, statusControl);
+    contact.append(phone, date, whatsapp, statusControl, deleteButton);
     article.append(content, contact);
     return article;
 }
