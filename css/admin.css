@@ -1281,11 +1281,13 @@ a {
 }
 
 .property-images__upload strong {
+    display: block;
     font-size: 0.76rem;
 }
 
 .property-images__upload small {
-    margin-left: auto;
+    display: block;
+    margin-top: 3px;
     color: var(--admin-muted);
     font-size: 0.62rem;
 }
@@ -1336,6 +1338,7 @@ a {
     position: absolute;
     top: 12px;
     left: 12px;
+    z-index: 2;
     padding: 6px 9px;
     border-radius: 999px;
     color: #fff;
@@ -1400,15 +1403,6 @@ a {
 @media (max-width: 560px) {
     .property-images__grid {
         grid-template-columns: 1fr;
-    }
-
-    .property-images__upload {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .property-images__upload small {
-        margin-left: 0;
     }
 }
 

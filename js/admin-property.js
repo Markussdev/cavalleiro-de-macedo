@@ -72,20 +72,6 @@ function getPropertyImageUrl(storagePath) {
     return data?.publicUrl || "";
 }
 
-function formatPropertyImageSize(bytes) {
-    const numericBytes = Number(bytes);
-
-    if (!Number.isFinite(numericBytes)) {
-        return "";
-    }
-
-    if (numericBytes < 1024 * 1024) {
-        return `${(numericBytes / 1024).toFixed(0)} KB`;
-    }
-
-    return `${(numericBytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-
 function validatePropertyImage(file) {
     if (!ALLOWED_PROPERTY_IMAGE_TYPES.has(file.type)) {
         return "Formato não permitido. Use JPG, PNG ou WebP.";
@@ -112,7 +98,6 @@ function createPropertyImageCard(image) {
     const coverButton = document.createElement("button");
     const removeButton = document.createElement("button");
     const imageName = image.original_name || "Imagem do imóvel";
-    const imageSize = formatPropertyImageSize(image.size_bytes);
 
     article.className = "property-image";
     article.dataset.propertyImageId = image.id;
@@ -125,7 +110,7 @@ function createPropertyImageCard(image) {
     img.alt = image.alt_text || currentProperty?.title || "Foto do imóvel";
     img.loading = "lazy";
 
-    name.textContent = imageSize ? `${imageName} · ${imageSize}` : imageName;
+    name.textContent = imageName;
     name.title = imageName;
 
     preview.append(img);
@@ -220,12 +205,12 @@ async function uploadPropertyImage(file) {
         throw new Error("Salve o imóvel antes de adicionar fotos.");
     }
 
-    const extensionByType = {
-        "image/jpeg": "jpg",
-        "image/png": "png",
-        "image/webp": "webp"
-    };
-    const extension = extensionByType[file.type] || "jpg";
+    const extension = file.name
+        .split(".")
+        .pop()
+        ?.toLowerCase()
+        .replace(/[^a-z0-9]/g, "")
+        || "jpg";
     const imageId = crypto.randomUUID();
     const storagePath = `${currentProperty.id}/${imageId}.${extension}`;
     const { error: uploadError } = await window.supabaseClient
@@ -286,8 +271,6 @@ async function setPropertyCover(image, button) {
         return;
     }
 
-    const previousCover = propertyImages.find((item) => item.is_cover);
-
     button.disabled = true;
     button.textContent = "Salvando…";
     setPropertyImagesStatus();
@@ -312,18 +295,6 @@ async function setPropertyCover(image, button) {
             .maybeSingle();
 
         if (coverError || !updatedCover) {
-            if (previousCover) {
-                const { error: restoreError } = await window.supabaseClient
-                    .from("property_images")
-                    .update({ is_cover: true })
-                    .eq("id", previousCover.id)
-                    .eq("property_id", currentProperty.id);
-
-                if (restoreError) {
-                    console.error("Erro ao restaurar a capa anterior:", restoreError);
-                }
-            }
-
             throw coverError || new Error("A foto selecionada não foi encontrada.");
         }
 
@@ -335,9 +306,14 @@ async function setPropertyCover(image, button) {
         setPropertyImagesStatus("Foto de capa atualizada.", "success");
     } catch (error) {
         console.error("Erro ao definir capa:", error);
+
+        try {
+            await loadPropertyImages();
+        } catch {
+            // Mantém o erro principal da troca de capa.
+        }
+
         setPropertyImagesStatus("Não foi possível alterar a capa.", "error");
-        button.disabled = false;
-        button.textContent = "Definir como capa";
     }
 }
 
