@@ -1,16 +1,41 @@
 const panel = document.querySelector("[data-admin-panel]");
 const panelStatus = document.querySelector("[data-panel-status]");
 const adminName = document.querySelector("[data-admin-name]");
+const requestsList = document.querySelector("[data-legal-requests]");
+const requestsCount = document.querySelector("[data-requests-count]");
 const publishedList = document.querySelector("[data-published-posts]");
 const draftList = document.querySelector("[data-draft-posts]");
 const publishedCount = document.querySelector("[data-published-count]");
 const draftsCount = document.querySelector("[data-drafts-count]");
 const logoutButton = document.querySelector("[data-logout]");
 
+const requestLabels = {
+    regularizacao: "Regularização de imóvel",
+    "escritura-registro": "Escritura ou registro",
+    "compra-venda": "Compra e venda",
+    contrato: "Contrato imobiliário",
+    usucapiao: "Usucapião",
+    inventario: "Inventário / sucessão",
+    outro: "Outro"
+};
+
+const statusLabels = {
+    new: "Nova",
+    reviewing: "Em análise",
+    contacted: "Contato realizado",
+    closed: "Concluída"
+};
+
 const adminDateFormatter = new Intl.DateTimeFormat("pt-BR", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
+    timeZone: "America/Belem"
+});
+
+const adminTimeFormatter = new Intl.DateTimeFormat("pt-BR", {
+    hour: "2-digit",
+    minute: "2-digit",
     timeZone: "America/Belem"
 });
 
@@ -23,6 +48,131 @@ function formatAdminDate(value) {
     return Number.isNaN(date.getTime())
         ? "Sem data"
         : adminDateFormatter.format(date);
+}
+
+function formatRequestDate(value) {
+    if (!value) {
+        return "Data não informada";
+    }
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+        return "Data não informada";
+    }
+
+    return `${adminDateFormatter.format(date)} · ${adminTimeFormatter.format(date)}`;
+}
+
+function getWhatsappDigits(value) {
+    return String(value || "").replace(/\D/g, "");
+}
+
+function getInternationalWhatsapp(value) {
+    const digits = getWhatsappDigits(value);
+    return digits.startsWith("55") && digits.length >= 12
+        ? digits
+        : `55${digits}`;
+}
+
+function formatWhatsapp(value) {
+    const digits = getWhatsappDigits(value);
+    const localDigits = digits.startsWith("55") && digits.length >= 12
+        ? digits.slice(2)
+        : digits;
+
+    if (localDigits.length === 11) {
+        return `(${localDigits.slice(0, 2)}) ${localDigits.slice(2, 7)}-${localDigits.slice(7)}`;
+    }
+
+    if (localDigits.length === 10) {
+        return `(${localDigits.slice(0, 2)}) ${localDigits.slice(2, 6)}-${localDigits.slice(6)}`;
+    }
+
+    return value || "WhatsApp não informado";
+}
+
+function createLegalRequest(request) {
+    const article = document.createElement("article");
+    const content = document.createElement("div");
+    const status = document.createElement("span");
+    const title = document.createElement("h3");
+    const meta = document.createElement("p");
+    const contact = document.createElement("div");
+    const phone = document.createElement("strong");
+    const date = document.createElement("time");
+    const whatsapp = document.createElement("a");
+
+    const rawStatus = request.status || "new";
+    const hasKnownStatus = Object.prototype.hasOwnProperty.call(
+        statusLabels,
+        rawStatus
+    );
+    const statusKey = hasKnownStatus ? rawStatus : "unknown";
+    const requestType = requestLabels[request.request_type]
+        || request.request_type
+        || "Assunto não informado";
+    const whatsappDigits = getWhatsappDigits(request.whatsapp);
+
+    article.className = "admin-request";
+    content.className = "admin-request__content";
+    status.className = `admin-request__status admin-request__status--${statusKey}`;
+    contact.className = "admin-request__contact";
+    phone.className = "admin-request__phone";
+    date.className = "admin-request__date";
+    whatsapp.className = "admin-request__action";
+
+    status.textContent = hasKnownStatus
+        ? statusLabels[rawStatus]
+        : rawStatus;
+    title.textContent = request.name || "Nome não informado";
+    meta.textContent = `${request.city || "Cidade não informada"} · ${requestType}`;
+    phone.textContent = formatWhatsapp(request.whatsapp);
+    date.textContent = formatRequestDate(request.created_at);
+
+    if (request.created_at && !Number.isNaN(new Date(request.created_at).getTime())) {
+        date.dateTime = request.created_at;
+    }
+
+    if (whatsappDigits) {
+        whatsapp.href = `https://wa.me/${getInternationalWhatsapp(request.whatsapp)}`;
+        whatsapp.target = "_blank";
+        whatsapp.rel = "noopener noreferrer";
+        whatsapp.textContent = "Entrar em contato ↗";
+        whatsapp.setAttribute(
+            "aria-label",
+            `Entrar em contato com ${request.name || "solicitante"} pelo WhatsApp`
+        );
+    } else {
+        whatsapp.hidden = true;
+    }
+
+    content.append(status, title, meta);
+    contact.append(phone, date, whatsapp);
+    article.append(content, contact);
+    return article;
+}
+
+function renderLegalRequests(requests) {
+    requestsCount.textContent = String(requests.length);
+
+    if (!requests.length) {
+        const empty = document.createElement("p");
+        empty.className = "admin-posts__empty";
+        empty.textContent = "Nenhuma solicitação recebida.";
+        requestsList.replaceChildren(empty);
+        return;
+    }
+
+    requestsList.replaceChildren(...requests.map(createLegalRequest));
+}
+
+function renderRequestsError() {
+    const error = document.createElement("p");
+    error.className = "admin-posts__empty admin-posts__empty--error";
+    error.textContent = "Não foi possível carregar as solicitações agora.";
+    requestsCount.textContent = "—";
+    requestsList.replaceChildren(error);
 }
 
 function createAdminPost(post) {
@@ -114,10 +264,26 @@ async function loadAdminPanel() {
     adminName.textContent = membership.display_name || "Roberto";
     panel.hidden = false;
 
-    const { data: posts, error: postsError } = await window.supabaseClient
-        .from("posts")
-        .select("id, title, slug, category, published, published_at, updated_at")
-        .order("updated_at", { ascending: false });
+    const [requestsResult, postsResult] = await Promise.all([
+        window.supabaseClient
+            .from("legal_requests")
+            .select("id, created_at, name, whatsapp, city, request_type, status")
+            .order("created_at", { ascending: false }),
+        window.supabaseClient
+            .from("posts")
+            .select("id, title, slug, category, published, published_at, updated_at")
+            .order("updated_at", { ascending: false })
+    ]);
+
+    const { data: requests, error: requestsError } = requestsResult;
+    const { data: posts, error: postsError } = postsResult;
+
+    if (requestsError) {
+        console.error("Erro ao carregar solicitações:", requestsError);
+        renderRequestsError();
+    } else {
+        renderLegalRequests(requests || []);
+    }
 
     if (postsError) {
         console.error("Erro ao carregar publicações no painel:", postsError);

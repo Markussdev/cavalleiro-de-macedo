@@ -51,7 +51,7 @@
             <div>
                 <span>Painel administrativo</span>
                 <h1 id="panel-title">Olá, <span data-admin-name>Roberto</span>.</h1>
-                <p>Acompanhe os artigos publicados e os rascunhos do escritório.</p>
+                <p>Acompanhe as solicitações recebidas e as publicações do escritório.</p>
             </div>
 
             <a class="admin-button" href="./editor.html">
@@ -60,8 +60,21 @@
         </section>
 
         <p class="admin-panel__status" role="status" aria-live="polite" data-panel-status>
-            Carregando publicações…
+            Carregando painel…
         </p>
+
+        <section class="admin-requests" aria-labelledby="requests-title">
+            <div class="admin-posts__heading">
+                <h2 id="requests-title">Solicitações</h2>
+                <span data-requests-count>0</span>
+            </div>
+
+            <div
+                class="admin-requests__list"
+                data-legal-requests
+                aria-live="polite"
+            ></div>
+        </section>
 
         <section class="admin-posts" aria-labelledby="published-title">
             <div class="admin-posts__heading">
