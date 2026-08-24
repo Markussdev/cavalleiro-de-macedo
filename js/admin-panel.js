@@ -185,6 +185,85 @@ async function updateLegalRequestStatus({
     }
 }
 
+async function openLegalDocument(file, button) {
+    const originalText = button.textContent;
+    const newTab = window.open("", "_blank");
+
+    button.disabled = true;
+    button.textContent = "Abrindo…";
+
+    if (newTab) {
+        newTab.opener = null;
+    }
+
+    try {
+        const { data, error } = await window.supabaseClient
+            .storage
+            .from("legal-documents")
+            .createSignedUrl(file.storage_path, 300);
+
+        if (error) {
+            throw error;
+        }
+
+        if (!data?.signedUrl) {
+            throw new Error("URL do documento não gerada.");
+        }
+
+        if (newTab) {
+            newTab.location.href = data.signedUrl;
+        } else {
+            window.location.href = data.signedUrl;
+        }
+    } catch (error) {
+        console.error("Erro ao abrir documento:", error);
+        newTab?.close();
+        window.alert("Não foi possível abrir o documento.");
+    } finally {
+        button.disabled = false;
+        button.textContent = originalText;
+    }
+}
+
+function createRequestFiles(request) {
+    const files = request.files || [];
+
+    if (!files.length) {
+        return null;
+    }
+
+    const details = document.createElement("details");
+    const summary = document.createElement("summary");
+    const list = document.createElement("div");
+
+    details.className = "admin-request__files";
+    summary.textContent = files.length === 1
+        ? "1 documento"
+        : `${files.length} documentos`;
+    list.className = "admin-request__files-list";
+
+    files.forEach((file) => {
+        const button = document.createElement("button");
+
+        button.type = "button";
+        button.className = "admin-request__file";
+        button.textContent = file.original_name || "Documento sem nome";
+        button.setAttribute(
+            "aria-label",
+            `Abrir documento ${file.original_name || "sem nome"} em uma nova aba`
+        );
+
+        button.addEventListener("click", () => {
+            openLegalDocument(file, button);
+        });
+
+        list.append(button);
+    });
+
+    details.append(summary, list);
+    return details;
+}
+
 function createLegalRequest(request) {
     const article = document.createElement("article");
     const content = document.createElement("div");
@@ -200,6 +279,7 @@ function createLegalRequest(request) {
     const statusCaption = document.createElement("span");
     const statusSelect = document.createElement("select");
     const statusFeedback = document.createElement("p");
+    const files = createRequestFiles(request);
 
     const rawStatus = request.status || "new";
     const requestType = requestLabels[request.request_type]
@@ -277,6 +357,11 @@ function createLegalRequest(request) {
     });
 
     content.append(status, title, meta);
+
+    if (files) {
+        content.append(files);
+    }
+
     statusField.append(statusCaption, statusSelect);
     statusControl.append(statusField, statusFeedback);
     contact.append(phone, date, whatsapp, statusControl);
@@ -398,11 +483,15 @@ async function loadAdminPanel() {
     adminName.textContent = membership.display_name || "Roberto";
     panel.hidden = false;
 
-    const [requestsResult, postsResult] = await Promise.all([
+    const [requestsResult, filesResult, postsResult] = await Promise.all([
         window.supabaseClient
             .from("legal_requests")
             .select("id, created_at, name, whatsapp, city, request_type, status")
             .order("created_at", { ascending: false }),
+        window.supabaseClient
+            .from("legal_request_files")
+            .select("id, request_id, storage_path, original_name, mime_type, size_bytes, created_at")
+            .order("created_at", { ascending: true }),
         window.supabaseClient
             .from("posts")
             .select("id, title, slug, category, published, published_at, updated_at")
@@ -410,13 +499,31 @@ async function loadAdminPanel() {
     ]);
 
     const { data: requests, error: requestsError } = requestsResult;
+    const { data: requestFiles, error: requestFilesError } = filesResult;
     const { data: posts, error: postsError } = postsResult;
+
+    const filesByRequest = new Map();
+
+    if (requestFilesError) {
+        console.error("Erro ao carregar documentos:", requestFilesError);
+    } else {
+        (requestFiles || []).forEach((file) => {
+            const currentFiles = filesByRequest.get(file.request_id) || [];
+            currentFiles.push(file);
+            filesByRequest.set(file.request_id, currentFiles);
+        });
+    }
+
+    const requestsWithFiles = (requests || []).map((request) => ({
+        ...request,
+        files: filesByRequest.get(request.id) || []
+    }));
 
     if (requestsError) {
         console.error("Erro ao carregar solicitações:", requestsError);
         renderRequestsError();
     } else {
-        renderLegalRequests(requests || []);
+        renderLegalRequests(requestsWithFiles);
     }
 
     if (postsError) {

@@ -35,6 +35,10 @@
     padding: 0;
 }
 
+[hidden] {
+    display: none !important;
+}
+
 html {
     scroll-behavior: smooth;
     scroll-padding-top: var(--header-height);
@@ -3018,7 +3022,8 @@ html.reduce-motion *::after {
     color: var(--color-accent-text);
 }
 
-.lead-success__notice div > span {
+.lead-success__notice div > strong {
+    display: block;
     color: var(--color-accent-text);
     font-size: 0.56rem;
     font-weight: 600;
@@ -3026,7 +3031,8 @@ html.reduce-motion *::after {
     text-transform: uppercase;
 }
 
-.lead-success__notice p {
+.lead-success__notice div > span {
+    display: block;
     margin-top: 3px;
     color: var(--color-text-muted);
     font-size: 0.68rem;
