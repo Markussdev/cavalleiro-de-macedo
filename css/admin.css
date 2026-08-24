@@ -1185,6 +1185,233 @@ a {
     }
 }
 
+/* ================================================================
+   Fotos dos imóveis
+   ================================================================ */
+
+.property-images {
+    width: 100%;
+}
+
+.property-images__locked {
+    display: flex;
+    min-height: 100px;
+    align-items: center;
+    gap: 16px;
+    padding: 22px;
+    border: 1px dashed var(--admin-border);
+    border-radius: 14px;
+    color: var(--admin-muted);
+    background: rgba(24, 35, 32, 0.018);
+}
+
+.property-images__locked > span {
+    display: grid;
+    flex: 0 0 38px;
+    width: 38px;
+    height: 38px;
+    place-items: center;
+    border: 1px solid var(--admin-border);
+    border-radius: 50%;
+    color: var(--admin-accent);
+    font-size: 1.1rem;
+}
+
+.property-images__locked strong {
+    display: block;
+    color: var(--admin-text);
+    font-size: 0.76rem;
+    font-weight: 600;
+}
+
+.property-images__locked p {
+    margin: 4px 0 0;
+    font-size: 0.68rem;
+    line-height: 1.5;
+}
+
+.property-images__manager {
+    display: grid;
+    gap: 18px;
+}
+
+.property-images__upload {
+    display: flex;
+    min-height: 86px;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 20px;
+    border: 1px dashed var(--admin-border);
+    border-radius: 14px;
+    cursor: pointer;
+    background: rgba(24, 35, 32, 0.018);
+    transition: border-color 160ms ease, background-color 160ms ease;
+}
+
+.property-images__upload:hover {
+    border-color: var(--admin-green);
+    background: rgba(24, 58, 53, 0.035);
+}
+
+.property-images__upload:focus-within {
+    outline: 2px solid var(--admin-green);
+    outline-offset: 3px;
+}
+
+.property-images__upload input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.property-images__upload-icon {
+    display: grid;
+    flex: 0 0 40px;
+    width: 40px;
+    height: 40px;
+    place-items: center;
+    border: 1px solid var(--admin-border);
+    border-radius: 50%;
+    color: var(--admin-accent);
+    font-size: 1.15rem;
+}
+
+.property-images__upload strong {
+    font-size: 0.76rem;
+}
+
+.property-images__upload small {
+    margin-left: auto;
+    color: var(--admin-muted);
+    font-size: 0.62rem;
+}
+
+.property-images__status {
+    min-height: 18px;
+    margin: -6px 0 0;
+    color: var(--admin-muted);
+    font-size: 0.68rem;
+}
+
+.property-images__status[data-type="error"] {
+    color: #a33c25;
+}
+
+.property-images__status[data-type="success"] {
+    color: var(--admin-green);
+}
+
+.property-images__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.property-image {
+    overflow: hidden;
+    border: 1px solid var(--admin-border);
+    border-radius: 14px;
+    background: var(--admin-surface);
+}
+
+.property-image__preview {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: #e8e7e1;
+}
+
+.property-image__preview img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.property-image__cover {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 6px 9px;
+    border-radius: 999px;
+    color: #fff;
+    background: var(--admin-green);
+    font-size: 0.54rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.property-image__body {
+    padding: 13px 14px 14px;
+}
+
+.property-image__name {
+    margin: 0;
+    overflow: hidden;
+    color: var(--admin-muted);
+    font-size: 0.65rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.property-image__actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 11px;
+}
+
+.property-image__action {
+    padding: 0;
+    border: 0;
+    border-bottom: 1px solid transparent;
+    background: transparent;
+    color: var(--admin-green);
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.64rem;
+}
+
+.property-image__action:hover {
+    border-color: currentColor;
+}
+
+.property-image__action--remove {
+    color: var(--admin-accent);
+}
+
+.property-image__action:disabled {
+    cursor: wait;
+    opacity: 0.45;
+}
+
+@media (max-width: 850px) {
+    .property-images__grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 560px) {
+    .property-images__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .property-images__upload {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .property-images__upload small {
+        margin-left: 0;
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
     *,
     *::before,

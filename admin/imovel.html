@@ -229,6 +229,68 @@
 
             <div class="property-form__section">
                 <span class="property-form__section-number">05</span>
+                <h2>Fotos</h2>
+            </div>
+
+            <div class="property-images" data-property-images>
+                <div
+                    class="property-images__locked"
+                    data-property-images-locked
+                >
+                    <span aria-hidden="true">＋</span>
+
+                    <div>
+                        <strong>Salve o imóvel primeiro</strong>
+                        <p>
+                            Depois do primeiro salvamento, você poderá adicionar as fotos.
+                        </p>
+                    </div>
+                </div>
+
+                <div
+                    class="property-images__manager"
+                    data-property-images-manager
+                    hidden
+                >
+                    <label
+                        class="property-images__upload"
+                        for="propertyImagesInput"
+                    >
+                        <input
+                            id="propertyImagesInput"
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
+                            multiple
+                            data-property-images-input
+                        >
+
+                        <span
+                            class="property-images__upload-icon"
+                            aria-hidden="true"
+                        >
+                            ＋
+                        </span>
+
+                        <strong>Adicionar fotos</strong>
+                        <small>JPG, PNG ou WebP · até 10 MB por imagem</small>
+                    </label>
+
+                    <p
+                        class="property-images__status"
+                        role="status"
+                        aria-live="polite"
+                        data-property-images-status
+                    ></p>
+
+                    <div
+                        class="property-images__grid"
+                        data-property-images-grid
+                    ></div>
+                </div>
+            </div>
+
+            <div class="property-form__section">
+                <span class="property-form__section-number">06</span>
                 <h2>Publicação</h2>
             </div>
 
