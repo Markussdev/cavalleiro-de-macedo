@@ -3,6 +3,8 @@ const panelStatus = document.querySelector("[data-panel-status]");
 const adminName = document.querySelector("[data-admin-name]");
 const requestsList = document.querySelector("[data-legal-requests]");
 const requestsCount = document.querySelector("[data-requests-count]");
+const propertiesList = document.querySelector("[data-properties]");
+const propertiesCount = document.querySelector("[data-properties-count]");
 const publishedList = document.querySelector("[data-published-posts]");
 const draftList = document.querySelector("[data-draft-posts]");
 const publishedCount = document.querySelector("[data-published-count]");
@@ -26,6 +28,20 @@ const statusLabels = {
     closed: "Concluída"
 };
 
+const propertyStatusLabels = {
+    draft: "Rascunho",
+    available: "Disponível",
+    reserved: "Reservado",
+    sold: "Vendido",
+    rented: "Alugado",
+    inactive: "Inativo"
+};
+
+const propertyPurposeLabels = {
+    sale: "Venda",
+    rent: "Locação"
+};
+
 let legalRequests = [];
 
 const adminDateFormatter = new Intl.DateTimeFormat("pt-BR", {
@@ -39,6 +55,13 @@ const adminTimeFormatter = new Intl.DateTimeFormat("pt-BR", {
     hour: "2-digit",
     minute: "2-digit",
     timeZone: "America/Belem"
+});
+
+const propertyPriceFormatter = new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2
 });
 
 function formatAdminDate(value) {
@@ -478,6 +501,93 @@ function renderRequestsError() {
     requestsList.replaceChildren(error);
 }
 
+function formatPropertyPrice(property) {
+    if (property.price_on_request) {
+        return "Valor sob consulta";
+    }
+
+    const price = Number(property.price);
+    return Number.isFinite(price)
+        ? propertyPriceFormatter.format(price)
+        : "Preço não informado";
+}
+
+function createAdminProperty(property) {
+    const article = document.createElement("article");
+    const content = document.createElement("div");
+    const status = document.createElement("span");
+    const title = document.createElement("h3");
+    const location = document.createElement("p");
+    const details = document.createElement("p");
+    const actions = document.createElement("div");
+    const editAction = document.createElement("a");
+
+    const statusKey = Object.prototype.hasOwnProperty.call(
+        propertyStatusLabels,
+        property.status
+    )
+        ? property.status
+        : "unknown";
+    const statusLabel = statusKey === "unknown"
+        ? property.status || "Status não informado"
+        : propertyStatusLabels[statusKey];
+    const purposeLabel = propertyPurposeLabels[property.purpose]
+        || property.purpose
+        || "Finalidade não informada";
+    const cityState = [property.city, property.state]
+        .filter(Boolean)
+        .join(" - ") || "Localização não informada";
+    const locationLabel = [property.neighborhood, cityState]
+        .filter(Boolean)
+        .join(" · ");
+
+    article.className = "admin-post admin-property";
+    content.className = "admin-post__content";
+    status.className = `admin-property__status admin-property__status--${statusKey}`;
+    location.className = "admin-post__meta";
+    details.className = "admin-post__meta admin-property__details";
+    actions.className = "admin-post__actions";
+    editAction.className = "admin-post__action";
+
+    status.textContent = statusLabel;
+    title.textContent = property.title || "Imóvel sem título";
+    location.textContent = locationLabel;
+    details.textContent = `${purposeLabel} · ${formatPropertyPrice(property)}`;
+    editAction.href = `./imovel.html?id=${encodeURIComponent(property.id)}`;
+    editAction.textContent = "Editar →";
+    editAction.setAttribute(
+        "aria-label",
+        `Editar imóvel: ${property.title || "sem título"}`
+    );
+
+    content.append(status, title, location, details);
+    actions.append(editAction);
+    article.append(content, actions);
+    return article;
+}
+
+function renderProperties(properties) {
+    propertiesCount.textContent = String(properties.length);
+
+    if (!properties.length) {
+        const empty = document.createElement("p");
+        empty.className = "admin-posts__empty";
+        empty.textContent = "Nenhum imóvel cadastrado.";
+        propertiesList.replaceChildren(empty);
+        return;
+    }
+
+    propertiesList.replaceChildren(...properties.map(createAdminProperty));
+}
+
+function renderPropertiesError() {
+    const error = document.createElement("p");
+    error.className = "admin-posts__empty admin-posts__empty--error";
+    error.textContent = "Não foi possível carregar os imóveis agora.";
+    propertiesCount.textContent = "—";
+    propertiesList.replaceChildren(error);
+}
+
 function createAdminPost(post) {
     const article = document.createElement("article");
     const content = document.createElement("div");
@@ -567,7 +677,7 @@ async function loadAdminPanel() {
     adminName.textContent = membership.display_name || "Roberto";
     panel.hidden = false;
 
-    const [requestsResult, filesResult, postsResult] = await Promise.all([
+    const [requestsResult, filesResult, propertiesResult, postsResult] = await Promise.all([
         window.supabaseClient
             .from("legal_requests")
             .select("id, created_at, name, whatsapp, city, request_type, status")
@@ -577,6 +687,10 @@ async function loadAdminPanel() {
             .select("id, request_id, storage_path, original_name, mime_type, size_bytes, created_at")
             .order("created_at", { ascending: true }),
         window.supabaseClient
+            .from("properties")
+            .select("id, title, purpose, price, price_on_request, city, state, neighborhood, status, updated_at")
+            .order("updated_at", { ascending: false }),
+        window.supabaseClient
             .from("posts")
             .select("id, title, slug, category, published, published_at, updated_at")
             .order("updated_at", { ascending: false })
@@ -584,6 +698,7 @@ async function loadAdminPanel() {
 
     const { data: requests, error: requestsError } = requestsResult;
     const { data: requestFiles, error: requestFilesError } = filesResult;
+    const { data: properties, error: propertiesError } = propertiesResult;
     const { data: posts, error: postsError } = postsResult;
 
     const filesByRequest = new Map();
@@ -608,6 +723,13 @@ async function loadAdminPanel() {
         renderRequestsError();
     } else {
         renderLegalRequests(requestsWithFiles);
+    }
+
+    if (propertiesError) {
+        console.error("Erro ao carregar imóveis:", propertiesError);
+        renderPropertiesError();
+    } else {
+        renderProperties(properties || []);
     }
 
     if (postsError) {

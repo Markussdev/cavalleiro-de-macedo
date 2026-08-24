@@ -51,7 +51,7 @@
             <div>
                 <span>Painel administrativo</span>
                 <h1 id="panel-title">Olá, <span data-admin-name>Roberto</span>.</h1>
-                <p>Acompanhe as solicitações recebidas e as publicações do escritório.</p>
+                <p>Acompanhe as solicitações, os imóveis e as publicações do escritório.</p>
             </div>
 
             <div class="admin-panel__actions">
@@ -83,6 +83,19 @@
             <div
                 class="admin-requests__list"
                 data-legal-requests
+                aria-live="polite"
+            ></div>
+        </section>
+
+        <section class="admin-properties" aria-labelledby="properties-title">
+            <div class="admin-posts__heading">
+                <h2 id="properties-title">Imóveis</h2>
+                <span data-properties-count>0</span>
+            </div>
+
+            <div
+                class="admin-posts__list"
+                data-properties
                 aria-live="polite"
             ></div>
         </section>

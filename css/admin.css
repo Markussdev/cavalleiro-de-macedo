@@ -297,6 +297,14 @@ a {
     margin-bottom: 70px;
 }
 
+.admin-properties {
+    margin-bottom: 70px;
+}
+
+.admin-properties + .admin-posts {
+    margin-top: 0;
+}
+
 .admin-requests__list {
     display: grid;
     gap: 14px;
@@ -382,6 +390,50 @@ a {
 
 .admin-post__action--view {
     color: var(--admin-green);
+}
+
+.admin-property__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 10px;
+    color: var(--admin-muted);
+    font-size: 0.58rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.admin-property__status::before {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    content: "";
+}
+
+.admin-property__status--draft,
+.admin-property__status--inactive,
+.admin-property__status--unknown {
+    color: var(--admin-muted);
+}
+
+.admin-property__status--available {
+    color: var(--admin-green);
+}
+
+.admin-property__status--reserved {
+    color: #8a6426;
+}
+
+.admin-property__status--sold,
+.admin-property__status--rented {
+    color: var(--admin-accent);
+}
+
+.admin-property__details {
+    margin-top: 5px;
+    color: var(--admin-text);
 }
 
 .admin-posts__empty {
@@ -1021,6 +1073,10 @@ a {
     }
 
     .admin-requests {
+        margin-bottom: 55px;
+    }
+
+    .admin-properties {
         margin-bottom: 55px;
     }
 
