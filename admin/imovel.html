@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Editor de imóveis de Cavalleiro de Macedo Advocacia.">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#18302d">
+
+    <link rel="icon" href="../assets/brand/cavalleiro-mark.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap"
+        rel="stylesheet"
+    >
+    <link rel="stylesheet" href="../css/admin.css">
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"
+        defer
+    ></script>
+    <script src="../js/supabase.js" defer></script>
+    <script src="../js/admin-property.js" defer></script>
+
+    <title>Novo imóvel | Cavalleiro de Macedo</title>
+</head>
+
+<body class="admin-body admin-body--panel">
+    <p
+        class="admin-editor__loading"
+        role="status"
+        data-property-loading
+    >
+        Carregando imóvel…
+    </p>
+
+    <main class="admin-editor" hidden data-property-editor>
+        <header class="admin-panel__header">
+            <a
+                class="admin-brand"
+                href="../index.html"
+                aria-label="Cavalleiro de Macedo Advocacia — abrir o site"
+            >
+                <img src="../assets/brand/cavalleiro-mark.svg" alt="">
+
+                <span>
+                    <strong>Cavalleiro de Macedo</strong>
+                    <small>Administração</small>
+                </span>
+            </a>
+
+            <a class="admin-editor__back" href="./painel.html">
+                ← Voltar ao painel
+            </a>
+        </header>
+
+        <section class="admin-editor__heading" aria-labelledby="property-editor-title">
+            <span data-property-eyebrow>Novo imóvel</span>
+            <h1 id="property-editor-title" data-property-title>Cadastrar imóvel</h1>
+            <p>
+                Insira as informações que serão utilizadas na divulgação do imóvel.
+            </p>
+        </section>
+
+        <form class="admin-editor__form property-form" data-property-form>
+            <div class="property-form__section">
+                <span class="property-form__section-number">01</span>
+                <h2>Informações principais</h2>
+            </div>
+
+            <label class="admin-field admin-field--wide">
+                <span>Título *</span>
+                <input
+                    type="text"
+                    name="title"
+                    maxlength="160"
+                    placeholder="Ex.: Apartamento no Umarizal"
+                    required
+                >
+            </label>
+
+            <div class="property-form__grid">
+                <label class="admin-field">
+                    <span>Finalidade *</span>
+                    <select name="purpose" required>
+                        <option value="">Selecione</option>
+                        <option value="sale">Venda</option>
+                        <option value="rent">Locação</option>
+                    </select>
+                </label>
+
+                <label class="admin-field">
+                    <span>Tipo *</span>
+                    <select name="property_type" required>
+                        <option value="">Selecione</option>
+                        <option value="house">Casa</option>
+                        <option value="apartment">Apartamento</option>
+                        <option value="commercial">Comercial</option>
+                        <option value="land">Terreno</option>
+                        <option value="rural">Rural</option>
+                        <option value="other">Outro</option>
+                    </select>
+                </label>
+            </div>
+
+            <div class="property-form__grid">
+                <label class="admin-field">
+                    <span>Preço</span>
+                    <input
+                        type="number"
+                        name="price"
+                        min="0"
+                        step="0.01"
+                        placeholder="650000"
+                    >
+                    <small>Informe apenas números.</small>
+                </label>
+
+                <label class="property-checkbox">
+                    <input type="checkbox" name="price_on_request">
+                    <span>Exibir “Valor sob consulta”</span>
+                </label>
+            </div>
+
+            <div class="property-form__section">
+                <span class="property-form__section-number">02</span>
+                <h2>Localização</h2>
+            </div>
+
+            <div class="property-form__grid">
+                <label class="admin-field">
+                    <span>Cidade *</span>
+                    <input
+                        type="text"
+                        name="city"
+                        maxlength="120"
+                        placeholder="Belém"
+                        required
+                    >
+                </label>
+
+                <label class="admin-field">
+                    <span>Estado *</span>
+                    <select name="state" required>
+                        <option value="">UF</option>
+                        <option value="PA">Pará</option>
+                        <option value="AP">Amapá</option>
+                        <option value="AM">Amazonas</option>
+                        <option value="MA">Maranhão</option>
+                    </select>
+                </label>
+            </div>
+
+            <label class="admin-field admin-field--wide">
+                <span>Bairro</span>
+                <input
+                    type="text"
+                    name="neighborhood"
+                    maxlength="120"
+                    placeholder="Ex.: Umarizal"
+                >
+            </label>
+
+            <div class="property-form__section">
+                <span class="property-form__section-number">03</span>
+                <h2>Características</h2>
+            </div>
+
+            <div class="property-form__features">
+                <label class="admin-field">
+                    <span>Quartos</span>
+                    <input type="number" name="bedrooms" min="0" step="1">
+                </label>
+
+                <label class="admin-field">
+                    <span>Banheiros</span>
+                    <input type="number" name="bathrooms" min="0" step="1">
+                </label>
+
+                <label class="admin-field">
+                    <span>Vagas</span>
+                    <input type="number" name="parking_spots" min="0" step="1">
+                </label>
+
+                <label class="admin-field">
+                    <span>Área (m²)</span>
+                    <input type="number" name="area_m2" min="0" step="0.01">
+                </label>
+            </div>
+
+            <div class="property-form__section">
+                <span class="property-form__section-number">04</span>
+                <h2>Apresentação</h2>
+            </div>
+
+            <label class="admin-field admin-field--wide">
+                <span>Descrição</span>
+                <textarea
+                    name="description"
+                    rows="8"
+                    maxlength="5000"
+                    placeholder="Descreva o imóvel, localização, diferenciais e demais informações relevantes."
+                ></textarea>
+            </label>
+
+            <div class="property-form__section">
+                <span class="property-form__section-number">05</span>
+                <h2>Publicação</h2>
+            </div>
+
+            <div class="property-form__grid">
+                <label class="admin-field">
+                    <span>Status</span>
+                    <select name="status">
+                        <option value="draft">Rascunho</option>
+                        <option value="available">Disponível</option>
+                        <option value="reserved">Reservado</option>
+                        <option value="sold">Vendido</option>
+                        <option value="rented">Alugado</option>
+                        <option value="inactive">Inativo</option>
+                    </select>
+                </label>
+
+                <label class="property-checkbox">
+                    <input type="checkbox" name="featured">
+                    <span>Destacar este imóvel</span>
+                </label>
+            </div>
+
+            <div class="admin-editor__footer admin-field--wide">
+                <p
+                    class="admin-editor__status"
+                    role="status"
+                    aria-live="polite"
+                    data-property-status
+                ></p>
+
+                <button class="admin-button" type="submit" data-property-save>
+                    Salvar imóvel
+                </button>
+            </div>
+        </form>
+    </main>
+
+    <noscript>
+        <p class="admin-noscript">Ative o JavaScript para usar o editor administrativo.</p>
+    </noscript>
+</body>
+</html>

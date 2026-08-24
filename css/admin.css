@@ -260,6 +260,12 @@ a {
     font-size: clamp(3rem, 7vw, 5.4rem);
 }
 
+.admin-panel__actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
 .admin-button {
     flex: 0 0 auto;
     gap: 35px;
@@ -989,6 +995,16 @@ a {
         gap: 28px;
     }
 
+    .admin-panel__actions {
+        width: 100%;
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .admin-panel__actions .admin-button {
+        width: 100%;
+    }
+
     .admin-button {
         align-self: flex-start;
     }
@@ -1035,6 +1051,81 @@ a {
 
     .admin-editor__actions .admin-button {
         width: 100%;
+    }
+}
+
+/* ================================================================
+   Editor de imóveis
+   ================================================================ */
+
+.property-form {
+    gap: 26px;
+}
+
+.property-form__section {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 20px;
+    padding-top: 30px;
+    border-top: 1px solid var(--admin-border);
+}
+
+.property-form__section:first-child {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+}
+
+.property-form__section-number {
+    color: var(--admin-accent);
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+}
+
+.property-form__section h2 {
+    margin: 0;
+    font-family: var(--admin-serif);
+    font-size: 1.75rem;
+    font-weight: 400;
+}
+
+.property-form__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.property-form__features {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.property-checkbox {
+    display: flex;
+    min-height: 50px;
+    align-items: center;
+    gap: 10px;
+    padding-top: 25px;
+    cursor: pointer;
+    font-size: 0.73rem;
+}
+
+.property-checkbox input {
+    width: 17px;
+    height: 17px;
+}
+
+@media (max-width: 760px) {
+    .property-form__grid,
+    .property-form__features {
+        grid-template-columns: 1fr;
+    }
+
+    .property-checkbox {
+        padding-top: 0;
     }
 }
 
