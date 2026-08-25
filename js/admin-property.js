@@ -3,6 +3,7 @@ const propertyLoading = document.querySelector("[data-property-loading]");
 const propertyForm = document.querySelector("[data-property-form]");
 const propertyStatus = document.querySelector("[data-property-status]");
 const propertySaveButton = document.querySelector("[data-property-save]");
+const propertyDeleteButton = document.querySelector("[data-property-delete]");
 const propertyEyebrow = document.querySelector("[data-property-eyebrow]");
 const propertyTitle = document.querySelector("[data-property-title]");
 const propertyImagesLocked = document.querySelector("[data-property-images-locked]");
@@ -16,6 +17,7 @@ const propertyId = params.get("id");
 
 let currentProperty = null;
 let isSaving = false;
+let isDeletingProperty = false;
 let propertyImages = [];
 let isUploadingImages = false;
 
@@ -401,6 +403,99 @@ async function removePropertyImage(image, button) {
     }
 }
 
+async function deleteCurrentProperty() {
+    if (!currentProperty?.id || isDeletingProperty || isSaving) {
+        return;
+    }
+
+    if (isUploadingImages) {
+        setPropertyStatus(
+            "Aguarde o envio das fotos terminar antes de excluir.",
+            "error"
+        );
+        return;
+    }
+
+    const propertyName = currentProperty.title || "este imóvel";
+    const confirmed = window.confirm(
+        `Excluir "${propertyName}"?\n\n`
+        + "O imóvel e suas fotos serão removidos. "
+        + "Os históricos de interesse serão preservados.\n\n"
+        + "Esta ação não pode ser desfeita."
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    isDeletingProperty = true;
+    propertyDeleteButton.disabled = true;
+    propertyDeleteButton.textContent = "Excluindo…";
+    propertySaveButton.disabled = true;
+    propertyForm.setAttribute("aria-busy", "true");
+    setPropertyStatus("Excluindo imóvel…");
+
+    try {
+        const { data: images, error: imagesError } = await window.supabaseClient
+            .from("property_images")
+            .select("storage_path")
+            .eq("property_id", currentProperty.id);
+
+        if (imagesError) {
+            throw imagesError;
+        }
+
+        const storagePaths = (images || [])
+            .map((image) => image.storage_path)
+            .filter(Boolean);
+
+        const { data: deletedProperty, error: deleteError } = await window.supabaseClient
+            .from("properties")
+            .delete()
+            .eq("id", currentProperty.id)
+            .select("id")
+            .maybeSingle();
+
+        if (deleteError || !deletedProperty) {
+            throw (
+                deleteError
+                || new Error("O imóvel não foi encontrado ou não pôde ser removido.")
+            );
+        }
+
+        let storageCleanupError = null;
+
+        if (storagePaths.length) {
+            const { error } = await window.supabaseClient
+                .storage
+                .from("property-images")
+                .remove(storagePaths);
+
+            storageCleanupError = error;
+        }
+
+        if (storageCleanupError) {
+            console.error(
+                "Imóvel removido, mas houve erro ao limpar fotos do Storage:",
+                storageCleanupError
+            );
+            window.alert(
+                "O imóvel foi excluído, mas alguns arquivos de imagem não puderam ser removidos do armazenamento."
+            );
+        }
+
+        window.location.replace("./painel.html?imovel=excluido");
+    } catch (error) {
+        console.error("Erro ao excluir imóvel:", error);
+        setPropertyStatus("Não foi possível excluir o imóvel.", "error");
+        isDeletingProperty = false;
+        propertyDeleteButton.disabled = false;
+        propertyDeleteButton.textContent = "Excluir imóvel";
+        propertySaveButton.disabled = false;
+        propertyForm.setAttribute("aria-busy", "false");
+    }
+}
+
 async function requireAdmin() {
     if (!window.supabaseClient) {
         return false;
@@ -555,6 +650,7 @@ function showEditingState(property) {
     propertyEyebrow.textContent = "Editar imóvel";
     propertyTitle.textContent = property.title;
     document.title = `Editar ${property.title} | Cavalleiro de Macedo`;
+    propertyDeleteButton.hidden = false;
 }
 
 async function loadProperty(id) {
@@ -730,6 +826,8 @@ propertyForm?.addEventListener("submit", async (event) => {
         setSaving(false);
     }
 });
+
+propertyDeleteButton?.addEventListener("click", deleteCurrentProperty);
 
 async function initPropertyEditor() {
     try {

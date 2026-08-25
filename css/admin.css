@@ -1431,6 +1431,47 @@ a {
     }
 }
 
+/* ================================================================
+   Exclusão de imóvel
+   ================================================================ */
+
+.admin-editor__footer-actions {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.admin-button--danger {
+    margin-right: auto;
+    border: 1px solid rgba(177, 70, 45, 0.38);
+    color: #a94c35;
+    background: transparent;
+}
+
+.admin-button--danger:hover {
+    border-color: #a94c35;
+    color: #fff;
+    background: #a94c35;
+}
+
+.admin-button--danger:disabled {
+    cursor: wait;
+    opacity: 0.5;
+}
+
+@media (max-width: 560px) {
+    .admin-editor__footer-actions {
+        align-items: stretch;
+        flex-direction: column-reverse;
+    }
+
+    .admin-button--danger {
+        margin-right: 0;
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
     *,
     *::before,

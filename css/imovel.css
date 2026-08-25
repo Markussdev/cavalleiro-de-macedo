@@ -119,14 +119,14 @@
     padding: 26px 20px;
 }
 
-.property-page__features strong {
+.property-page__features dd {
     display: block;
     font-family: "Newsreader", Georgia, serif;
     font-size: 2rem;
     font-weight: 400;
 }
 
-.property-page__features span {
+.property-page__features dt {
     color: #68716d;
     font-size: 0.65rem;
 }
@@ -145,10 +145,15 @@
     font-weight: 400;
 }
 
-.property-page__description p {
+.property-page__description-content {
+    display: grid;
+    gap: 16px;
+}
+
+.property-page__description-content p {
+    margin: 0;
     color: #394542;
     line-height: 1.8;
-    white-space: pre-line;
 }
 
 /* CTA */
@@ -432,9 +437,9 @@
 }
 
 .property-page__header h1 {
-    max-width: 700px;
-    font-size: clamp(3.5rem, 6vw, 5.3rem);
-    line-height: 0.92;
+    max-width: 760px;
+    font-size: clamp(3.5rem, 5.3vw, 4.9rem);
+    line-height: 0.93;
 }
 
 .property-page__price strong {
@@ -455,7 +460,7 @@
     padding: 22px 16px;
 }
 
-.property-page__features strong {
+.property-page__features dd {
     font-size: 1.65rem;
 }
 

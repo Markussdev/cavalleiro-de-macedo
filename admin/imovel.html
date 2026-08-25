@@ -323,9 +323,24 @@
                     data-property-status
                 ></p>
 
-                <button class="admin-button" type="submit" data-property-save>
-                    Salvar imóvel
-                </button>
+                <div class="admin-editor__footer-actions">
+                    <button
+                        class="admin-button admin-button--danger"
+                        type="button"
+                        data-property-delete
+                        hidden
+                    >
+                        Excluir imóvel
+                    </button>
+
+                    <button
+                        class="admin-button"
+                        type="submit"
+                        data-property-save
+                    >
+                        Salvar imóvel
+                    </button>
+                </div>
             </div>
         </form>
     </main>

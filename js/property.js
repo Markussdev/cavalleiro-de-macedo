@@ -171,6 +171,23 @@ function validateInterestForm() {
     };
 }
 
+function renderDescription(description) {
+    const text = description?.trim()
+        || "Entre em contato para mais informações sobre este imóvel.";
+    const paragraphs = text
+        .split(/\n\s*\n/)
+        .map((paragraph) => paragraph.trim())
+        .filter(Boolean)
+        .map((paragraph) => {
+            const element = document.createElement("p");
+
+            element.textContent = paragraph;
+            return element;
+        });
+
+    propertyDescription.replaceChildren(...paragraphs);
+}
+
 function renderFeatures(property) {
     const features = [];
 
@@ -205,8 +222,8 @@ function renderFeatures(property) {
     propertyFeatures.replaceChildren(
         ...features.map((feature) => {
             const item = document.createElement("div");
-            const value = document.createElement("strong");
-            const label = document.createElement("span");
+            const label = document.createElement("dt");
+            const value = document.createElement("dd");
 
             value.textContent = feature.value;
             label.textContent = feature.label;
@@ -286,8 +303,7 @@ function renderProperty(property) {
     propertyPurpose.textContent = purposeLabels[property.purpose] || "Imóvel";
     propertyLocation.textContent = formatLocation(property) || "Localização sob consulta";
     propertyPrice.textContent = formatPrice(property);
-    propertyDescription.textContent = property.description
-        || "Entre em contato para mais informações sobre este imóvel.";
+    renderDescription(property.description);
 
     document.title = `${property.title} | Cavalleiro de Macedo`;
 

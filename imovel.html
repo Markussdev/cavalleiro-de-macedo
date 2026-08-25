@@ -116,140 +116,141 @@
                     ></div>
                 </div>
 
-                <div
+                <dl
                     class="property-page__features"
                     data-property-features
-                ></div>
+                ></dl>
 
                 <div class="property-page__lower">
                     <section class="property-page__description">
                         <span class="eyebrow">Sobre o imóvel</span>
                         <h2>Informações</h2>
-                        <p data-property-description></p>
+                        <div
+                            class="property-page__description-content"
+                            data-property-description
+                        ></div>
                     </section>
 
                     <aside class="property-page__cta">
-                    <div
-                        class="property-interest__intro"
-                        data-property-interest-intro
-                    >
-                        <span>Gostou deste imóvel?</span>
-                        <h2>Solicite mais informações.</h2>
-
-                        <button
-                            class="button button--primary"
-                            type="button"
-                            data-property-interest
-                            aria-expanded="false"
-                            aria-controls="propertyInterestForm"
+                        <div
+                            class="property-interest__intro"
+                            data-property-interest-intro
                         >
-                            Tenho interesse
-                            <span aria-hidden="true">→</span>
-                        </button>
-                    </div>
+                            <span>Gostou deste imóvel?</span>
+                            <h2>Solicite mais informações.</h2>
 
-                    <form
-                        class="property-interest"
-                        id="propertyInterestForm"
-                        data-property-interest-form
-                        hidden
-                        novalidate
-                    >
-                        <div class="property-interest__heading">
-                            <span>Interesse no imóvel</span>
-                            <h2>Vamos entrar em contato.</h2>
-                            <p>
-                                Informe seus dados para receber mais informações sobre este imóvel.
-                            </p>
-                        </div>
-
-                        <label class="property-interest__field">
-                            <span>Nome *</span>
-                            <input
-                                type="text"
-                                name="name"
-                                autocomplete="name"
-                                maxlength="120"
-                                placeholder="Seu nome"
-                                required
-                                data-property-interest-name
-                            >
-                        </label>
-
-                        <label class="property-interest__field">
-                            <span>WhatsApp *</span>
-                            <input
-                                type="tel"
-                                name="whatsapp"
-                                autocomplete="tel"
-                                inputmode="tel"
-                                maxlength="20"
-                                placeholder="(91) 99999-9999"
-                                required
-                                data-property-interest-whatsapp
-                            >
-                        </label>
-
-                        <label class="property-interest__consent">
-                            <input
-                                type="checkbox"
-                                name="privacy_consent"
-                                required
-                                data-property-interest-consent
-                            >
-                            <span>
-                                Concordo com o envio destes dados para contato sobre este imóvel.
-                            </span>
-                        </label>
-
-                        <p
-                            class="property-interest__status"
-                            role="status"
-                            aria-live="polite"
-                            data-property-interest-status
-                        ></p>
-
-                        <div class="property-interest__actions">
                             <button
                                 class="button button--primary"
-                                type="submit"
-                                data-property-interest-submit
+                                type="button"
+                                data-property-interest
+                                aria-expanded="false"
+                                aria-controls="propertyInterestForm"
                             >
-                                Solicitar informações
+                                Tenho interesse
                                 <span aria-hidden="true">→</span>
                             </button>
-
-                            <button
-                                class="property-interest__cancel"
-                                type="button"
-                                data-property-interest-cancel
-                            >
-                                Cancelar
-                            </button>
                         </div>
-                    </form>
 
-                    <div
-                        class="property-interest-success"
-                        data-property-interest-success
-                        tabindex="-1"
-                        hidden
-                    >
-                        <span
-                            class="property-interest-success__icon"
-                            aria-hidden="true"
+                        <form
+                            class="property-interest"
+                            id="propertyInterestForm"
+                            data-property-interest-form
+                            hidden
+                            novalidate
                         >
-                            ✓
-                        </span>
+                            <div class="property-interest__heading">
+                                <span>Interesse no imóvel</span>
+                                <h2>Vamos entrar em contato.</h2>
+                                <p>
+                                    Informe seus dados para receber mais informações sobre este imóvel.
+                                </p>
+                            </div>
 
-                        <div>
-                            <span>Interesse registrado</span>
-                            <h2>Recebemos seus dados.</h2>
-                            <p>O contato será realizado pelo número informado.</p>
-                        </div>
-                    </div>
+                            <label class="property-interest__field">
+                                <span>Nome *</span>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    autocomplete="name"
+                                    maxlength="120"
+                                    placeholder="Seu nome"
+                                    required
+                                    data-property-interest-name
+                                >
+                            </label>
+
+                            <label class="property-interest__field">
+                                <span>WhatsApp *</span>
+                                <input
+                                    type="tel"
+                                    name="whatsapp"
+                                    autocomplete="tel"
+                                    inputmode="tel"
+                                    maxlength="20"
+                                    placeholder="(91) 99999-9999"
+                                    required
+                                    data-property-interest-whatsapp
+                                >
+                            </label>
+
+                            <label class="property-interest__consent">
+                                <input
+                                    type="checkbox"
+                                    name="privacy_consent"
+                                    required
+                                    data-property-interest-consent
+                                >
+                                <span>
+                                    Concordo com o envio destes dados para contato sobre este imóvel.
+                                </span>
+                            </label>
+
+                            <p
+                                class="property-interest__status"
+                                role="status"
+                                aria-live="polite"
+                                data-property-interest-status
+                            ></p>
+
+                            <div class="property-interest__actions">
+                                <button
+                                    class="button button--primary"
+                                    type="submit"
+                                    data-property-interest-submit
+                                >
+                                    Solicitar informações
+                                    <span aria-hidden="true">→</span>
+                                </button>
+
+                                <button
+                                    class="property-interest__cancel"
+                                    type="button"
+                                    data-property-interest-cancel
+                                >
+                                    Cancelar
+                                </button>
+                            </div>
+                        </form>
+
+                        <div
+                            class="property-interest-success"
+                            data-property-interest-success
+                            tabindex="-1"
+                            hidden
+                        >
+                            <span
+                                class="property-interest-success__icon"
+                                aria-hidden="true"
+                            >
+                                ✓
+                            </span>
+
+                            <div>
+                                <span>Interesse registrado</span>
+                                <h2>Recebemos seus dados.</h2>
+                                <p>O contato será realizado pelo número informado.</p>
+                            </div>
                     </aside>
-                </div>
             </div>
         </section>
 
