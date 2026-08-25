@@ -10,11 +10,21 @@ const propertyThumbnails = document.querySelector("[data-property-thumbnails]");
 const propertyFeatures = document.querySelector("[data-property-features]");
 const propertyDescription = document.querySelector("[data-property-description]");
 const propertyInterest = document.querySelector("[data-property-interest]");
+const propertyInterestIntro = document.querySelector("[data-property-interest-intro]");
+const propertyInterestForm = document.querySelector("[data-property-interest-form]");
+const propertyInterestName = document.querySelector("[data-property-interest-name]");
+const propertyInterestWhatsapp = document.querySelector("[data-property-interest-whatsapp]");
+const propertyInterestConsent = document.querySelector("[data-property-interest-consent]");
+const propertyInterestStatus = document.querySelector("[data-property-interest-status]");
+const propertyInterestSubmit = document.querySelector("[data-property-interest-submit]");
+const propertyInterestCancel = document.querySelector("[data-property-interest-cancel]");
+const propertyInterestSuccess = document.querySelector("[data-property-interest-success]");
 
 const params = new URLSearchParams(window.location.search);
 const slug = params.get("slug");
 
 let currentProperty = null;
+let isSendingInterest = false;
 
 const priceFormatter = new Intl.NumberFormat("pt-BR", {
     style: "currency",
@@ -59,6 +69,106 @@ function formatPrice(property) {
     const value = priceFormatter.format(Number(property.price));
 
     return property.purpose === "rent" ? `${value} / mês` : value;
+}
+
+function normalizeWhatsapp(value) {
+    return String(value || "").replace(/\D/g, "");
+}
+
+function setInterestStatus(message = "", type = "") {
+    if (!propertyInterestStatus) {
+        return;
+    }
+
+    propertyInterestStatus.textContent = message;
+
+    if (type) {
+        propertyInterestStatus.dataset.type = type;
+    } else {
+        delete propertyInterestStatus.dataset.type;
+    }
+}
+
+function setInterestFormOpen(open) {
+    if (!propertyInterestForm || !propertyInterestIntro) {
+        return;
+    }
+
+    propertyInterestForm.hidden = !open;
+    propertyInterestIntro.hidden = open;
+    propertyInterest?.setAttribute("aria-expanded", String(open));
+
+    if (open) {
+        setInterestStatus();
+        window.setTimeout(() => propertyInterestName?.focus(), 50);
+    } else {
+        window.setTimeout(() => propertyInterest?.focus(), 50);
+    }
+}
+
+function setInterestSubmitting(sending) {
+    propertyInterestForm?.setAttribute("aria-busy", String(sending));
+
+    if (propertyInterestSubmit) {
+        propertyInterestSubmit.disabled = sending;
+
+        if (sending) {
+            propertyInterestSubmit.textContent = "Enviando…";
+        } else {
+            const arrow = document.createElement("span");
+
+            arrow.setAttribute("aria-hidden", "true");
+            arrow.textContent = "→";
+            propertyInterestSubmit.replaceChildren(
+                document.createTextNode("Solicitar informações "),
+                arrow
+            );
+        }
+    }
+
+    if (propertyInterestCancel) {
+        propertyInterestCancel.disabled = sending;
+    }
+}
+
+function validateInterestForm() {
+    const name = propertyInterestName?.value.trim() || "";
+    const whatsapp = normalizeWhatsapp(propertyInterestWhatsapp?.value);
+    const consent = Boolean(propertyInterestConsent?.checked);
+
+    if (name.length < 2 || name.length > 120) {
+        return {
+            error: "Informe seu nome.",
+            name,
+            whatsapp,
+            consent
+        };
+    }
+
+    if (whatsapp.length < 10 || whatsapp.length > 15) {
+        return {
+            error: "Informe um WhatsApp válido.",
+            name,
+            whatsapp,
+            consent
+        };
+    }
+
+    if (!consent) {
+        return {
+            error: "É necessário autorizar o envio dos dados.",
+            name,
+            whatsapp,
+            consent
+        };
+    }
+
+    return {
+        error: "",
+        name,
+        whatsapp,
+        consent
+    };
 }
 
 function renderFeatures(property) {
@@ -249,5 +359,75 @@ async function loadProperty() {
         showNotFound();
     }
 }
+
+propertyInterest?.addEventListener("click", () => {
+    if (!currentProperty?.id) {
+        return;
+    }
+
+    setInterestFormOpen(true);
+});
+
+propertyInterestCancel?.addEventListener("click", () => {
+    if (isSendingInterest) {
+        return;
+    }
+
+    setInterestFormOpen(false);
+});
+
+propertyInterestForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    if (
+        isSendingInterest
+        || !currentProperty?.id
+        || !window.supabaseClient
+    ) {
+        return;
+    }
+
+    const values = validateInterestForm();
+
+    if (values.error) {
+        setInterestStatus(values.error, "error");
+        return;
+    }
+
+    isSendingInterest = true;
+    setInterestSubmitting(true);
+    setInterestStatus("Enviando solicitação…");
+
+    try {
+        const { error } = await window.supabaseClient
+            .from("property_leads")
+            .insert({
+                property_id: currentProperty.id,
+                name: values.name,
+                whatsapp: values.whatsapp,
+                privacy_consent: true
+            });
+
+        if (error) {
+            throw error;
+        }
+
+        propertyInterestForm.reset();
+        propertyInterestForm.hidden = true;
+        propertyInterestIntro.hidden = true;
+        propertyInterestSuccess.hidden = false;
+        propertyInterest?.setAttribute("aria-expanded", "false");
+        propertyInterestSuccess.focus();
+    } catch (error) {
+        console.error("Erro ao registrar interesse:", error);
+        setInterestStatus(
+            "Não foi possível enviar agora. Tente novamente.",
+            "error"
+        );
+    } finally {
+        isSendingInterest = false;
+        setInterestSubmitting(false);
+    }
+});
 
 loadProperty();
