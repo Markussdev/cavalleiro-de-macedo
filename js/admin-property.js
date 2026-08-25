@@ -484,7 +484,7 @@ async function deleteCurrentProperty() {
             );
         }
 
-        window.location.replace("./painel.html?imovel=excluido");
+        window.location.replace("/admin/painel.html?imovel=excluido");
     } catch (error) {
         console.error("Erro ao excluir imóvel:", error);
         setPropertyStatus("Não foi possível excluir o imóvel.", "error");
@@ -834,7 +834,7 @@ async function initPropertyEditor() {
         const isAdmin = await requireAdmin();
 
         if (!isAdmin) {
-            window.location.replace("./index.html?erro=acesso");
+            window.location.replace("/admin/index.html?erro=acesso");
             return;
         }
 

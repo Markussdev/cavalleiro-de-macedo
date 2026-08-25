@@ -976,7 +976,7 @@ function renderPostGroup(container, counter, posts, emptyMessage) {
 }
 
 async function redirectToLogin() {
-    window.location.replace("./index.html?erro=acesso");
+    window.location.replace("/admin/index.html?erro=acesso");
 }
 
 async function loadAdminPanel() {
@@ -1152,7 +1152,7 @@ logoutButton?.addEventListener("click", async () => {
     logoutButton.textContent = "Saindo…";
 
     await window.supabaseClient?.auth.signOut();
-    window.location.replace("./index.html");
+    window.location.replace("/admin/index.html");
 });
 
 loadAdminPanel();

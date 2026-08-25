@@ -47,7 +47,7 @@ async function redirectAuthenticatedAdmin() {
     const { data: membership } = await getAdminMembership(user.id);
 
     if (membership) {
-        window.location.replace("./painel.html");
+        window.location.replace("/admin/painel.html");
     }
 }
 
@@ -87,7 +87,7 @@ loginForm?.addEventListener("submit", async (event) => {
             return;
         }
 
-        window.location.replace("./painel.html");
+        window.location.replace("/admin/painel.html");
     } catch (error) {
         console.error("Erro inesperado no login administrativo:", error);
         setLoginStatus("Não foi possível entrar agora. Tente novamente.", "error");

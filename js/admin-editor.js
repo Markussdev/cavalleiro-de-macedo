@@ -652,7 +652,7 @@ async function savePost(action) {
         }
 
         editorIsDirty = false;
-        window.location.replace(`./painel.html?salvo=${getRedirectState(action)}`);
+        window.location.replace(`/admin/painel.html?salvo=${getRedirectState(action)}`);
     } catch (error) {
         console.error("Erro ao salvar publicação:", error);
 
@@ -710,7 +710,7 @@ async function initializeEditor() {
     const isAdmin = await requireAdmin();
 
     if (!isAdmin) {
-        window.location.replace("./index.html?erro=acesso");
+        window.location.replace("/admin/index.html?erro=acesso");
         return;
     }
 
