@@ -309,3 +309,62 @@
         flex-direction: column;
     }
 }
+
+/* ================================================================
+   Catálogo V2
+   ================================================================ */
+
+.properties-hero {
+    padding: 145px 0 48px;
+}
+
+.properties-hero__grid {
+    grid-template-columns: minmax(0, 680px) minmax(220px, 320px);
+    justify-content: space-between;
+    gap: 60px;
+    margin-top: 14px;
+}
+
+.properties-hero h1 {
+    max-width: 680px;
+    font-size: clamp(3.6rem, 6vw, 5.5rem);
+    line-height: 0.9;
+}
+
+.properties-filters {
+    margin-top: 38px;
+}
+
+.properties-grid {
+    grid-template-columns: repeat(2, minmax(0, 520px));
+    justify-content: start;
+    gap: 52px 28px;
+}
+
+.property-card {
+    width: 100%;
+    max-width: 520px;
+}
+
+.property-card__image-link {
+    border-radius: 16px;
+}
+
+.property-card h2 {
+    font-size: clamp(1.8rem, 3vw, 2.5rem);
+}
+
+@media (max-width: 800px) {
+    .properties-hero {
+        padding: 125px 0 36px;
+    }
+
+    .properties-hero__grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .properties-grid {
+        grid-template-columns: 1fr;
+    }
+}

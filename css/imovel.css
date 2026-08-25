@@ -413,3 +413,123 @@
         align-self: flex-start;
     }
 }
+
+/* ================================================================
+   Página do imóvel V2
+   ================================================================ */
+
+.property-page {
+    padding: 130px 0 80px;
+}
+
+.property-page__back {
+    margin-bottom: 36px;
+}
+
+.property-page__header {
+    gap: 50px;
+    margin-bottom: 34px;
+}
+
+.property-page__header h1 {
+    max-width: 700px;
+    font-size: clamp(3.5rem, 6vw, 5.3rem);
+    line-height: 0.92;
+}
+
+.property-page__price strong {
+    font-size: 1.9rem;
+}
+
+.property-gallery__main {
+    max-height: 620px;
+    aspect-ratio: 3 / 2;
+    border-radius: 16px;
+}
+
+.property-page__features {
+    margin: 36px 0 54px;
+}
+
+.property-page__features div {
+    padding: 22px 16px;
+}
+
+.property-page__features strong {
+    font-size: 1.65rem;
+}
+
+.property-page__lower {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    align-items: start;
+    gap: clamp(48px, 8vw, 100px);
+    padding-top: 20px;
+}
+
+.property-page__description {
+    max-width: 720px;
+    padding: 18px 0 60px;
+}
+
+.property-page__description h2 {
+    margin: 10px 0 20px;
+    font-size: clamp(2.5rem, 4vw, 3.4rem);
+}
+
+.property-page__cta {
+    position: sticky;
+    top: calc(var(--header-height) + 24px);
+    width: 100%;
+    max-width: none;
+    padding: 28px;
+    border-radius: 14px;
+}
+
+.property-page__cta h2 {
+    margin: 8px 0 20px;
+    font-size: clamp(1.85rem, 3vw, 2.35rem);
+}
+
+.property-interest {
+    max-width: none;
+    gap: 14px;
+}
+
+.property-interest__heading h2 {
+    font-size: 2rem;
+}
+
+.property-interest__field input {
+    min-height: 46px;
+}
+
+.property-interest__actions {
+    gap: 14px;
+}
+
+.property-interest-success {
+    gap: 14px;
+}
+
+.property-interest-success__icon {
+    flex-basis: 38px;
+    width: 38px;
+    height: 38px;
+}
+
+.property-interest-success h2 {
+    font-size: 2rem;
+}
+
+@media (max-width: 850px) {
+    .property-page__lower {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .property-page__cta {
+        position: static;
+        max-width: 560px;
+    }
+}

@@ -185,6 +185,21 @@ ol {
     background: var(--color-primary-soft);
 }
 
+.button--outline {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    background: transparent;
+}
+
+.button--outline:hover {
+    color: var(--color-white);
+    background: var(--color-primary);
+}
+
+.button--outline:hover span {
+    transform: translateX(3px);
+}
+
 .text-link {
     display: inline-flex;
     align-items: center;
