@@ -3,6 +3,8 @@ const panelStatus = document.querySelector("[data-panel-status]");
 const adminName = document.querySelector("[data-admin-name]");
 const requestsList = document.querySelector("[data-legal-requests]");
 const requestsCount = document.querySelector("[data-requests-count]");
+const propertyLeadsList = document.querySelector("[data-property-leads]");
+const propertyLeadsCount = document.querySelector("[data-property-leads-count]");
 const propertiesList = document.querySelector("[data-properties]");
 const propertiesCount = document.querySelector("[data-properties-count]");
 const publishedList = document.querySelector("[data-published-posts]");
@@ -28,6 +30,13 @@ const statusLabels = {
     closed: "Concluída"
 };
 
+const propertyLeadStatusLabels = {
+    new: "Novo",
+    contacted: "Contato realizado",
+    completed: "Concluído",
+    not_attended: "Não atendido"
+};
+
 const propertyStatusLabels = {
     draft: "Rascunho",
     available: "Disponível",
@@ -43,6 +52,7 @@ const propertyPurposeLabels = {
 };
 
 let legalRequests = [];
+let propertyLeads = [];
 
 const adminDateFormatter = new Intl.DateTimeFormat("pt-BR", {
     day: "2-digit",
@@ -135,6 +145,53 @@ function setRequestStatusAppearance(element, value) {
     element.textContent = statusKey === "unknown"
         ? value
         : statusLabels[statusKey];
+}
+
+function isKnownPropertyLeadStatus(status) {
+    return Object.prototype.hasOwnProperty.call(
+        propertyLeadStatusLabels,
+        status
+    );
+}
+
+function getPropertyLeadStatusKey(status) {
+    if (!status) {
+        return "new";
+    }
+
+    return isKnownPropertyLeadStatus(status) ? status : "unknown";
+}
+
+function setPropertyLeadStatusAppearance(element, value) {
+    const statusKey = getPropertyLeadStatusKey(value);
+    const visualKey = {
+        new: "new",
+        contacted: "contacted",
+        completed: "closed",
+        not_attended: "not-attended",
+        unknown: "unknown"
+    }[statusKey];
+
+    element.className = `admin-request__status admin-request__status--${visualKey}`;
+    element.textContent = statusKey === "unknown"
+        ? value
+        : propertyLeadStatusLabels[statusKey];
+}
+
+function updatePropertyLeadsCount() {
+    const newLeads = propertyLeads.filter(
+        (lead) => getPropertyLeadStatusKey(lead.status) === "new"
+    ).length;
+
+    propertyLeadsCount.textContent = newLeads === 1
+        ? "1 novo"
+        : `${newLeads} novos`;
+    propertyLeadsCount.setAttribute(
+        "aria-label",
+        newLeads === 1
+            ? "1 novo interesse em imóvel"
+            : `${newLeads} novos interesses em imóveis`
+    );
 }
 
 function updateRequestsCount() {
@@ -501,6 +558,282 @@ function renderRequestsError() {
     requestsList.replaceChildren(error);
 }
 
+async function updatePropertyLeadStatus({
+    lead,
+    nextStatus,
+    select,
+    status,
+    article,
+    feedback
+}) {
+    const previousStatus = lead.status || "new";
+
+    if (
+        nextStatus === previousStatus
+        || !isKnownPropertyLeadStatus(nextStatus)
+    ) {
+        return;
+    }
+
+    lead.status = nextStatus;
+    setPropertyLeadStatusAppearance(status, nextStatus);
+    updatePropertyLeadsCount();
+
+    select.disabled = true;
+    article.dataset.saving = "true";
+    feedback.textContent = "Salvando status…";
+    feedback.dataset.type = "pending";
+
+    try {
+        const { data: updatedLead, error } = await window.supabaseClient
+            .from("property_leads")
+            .update({ status: nextStatus })
+            .eq("id", lead.id)
+            .select("id, status")
+            .maybeSingle();
+
+        if (error) {
+            throw error;
+        }
+
+        if (!updatedLead || updatedLead.status !== nextStatus) {
+            throw new Error("O interesse não foi atualizado.");
+        }
+
+        lead.status = updatedLead.status;
+        feedback.textContent = "Status atualizado.";
+        feedback.dataset.type = "success";
+    } catch (error) {
+        console.error("Erro ao atualizar interesse:", error);
+        lead.status = previousStatus;
+        select.value = previousStatus;
+        setPropertyLeadStatusAppearance(status, previousStatus);
+        updatePropertyLeadsCount();
+        feedback.textContent = "Não foi possível salvar.";
+        feedback.dataset.type = "error";
+    } finally {
+        select.disabled = false;
+        delete article.dataset.saving;
+    }
+}
+
+async function deletePropertyLead({ lead, article, button }) {
+    const confirmed = window.confirm(
+        `Remover o interesse de ${lead.name || "este contato"}?\n\n`
+        + "Esta ação não pode ser desfeita."
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    const originalText = button.textContent;
+
+    button.disabled = true;
+    button.textContent = "Removendo…";
+    article.dataset.deleting = "true";
+
+    try {
+        const { data: deletedLead, error } = await window.supabaseClient
+            .from("property_leads")
+            .delete()
+            .eq("id", lead.id)
+            .select("id")
+            .maybeSingle();
+
+        if (error) {
+            throw error;
+        }
+
+        if (!deletedLead || deletedLead.id !== lead.id) {
+            throw new Error("O interesse não foi removido.");
+        }
+
+        propertyLeads = propertyLeads.filter((item) => item.id !== lead.id);
+        updatePropertyLeadsCount();
+        article.classList.add("is-removing");
+
+        window.setTimeout(() => {
+            article.remove();
+
+            if (!propertyLeads.length) {
+                renderPropertyLeads([]);
+            }
+        }, 220);
+    } catch (error) {
+        console.error("Erro ao remover interesse:", error);
+        window.alert("Não foi possível remover o interesse.");
+        button.disabled = false;
+        button.textContent = originalText;
+        delete article.dataset.deleting;
+    }
+}
+
+function createPropertyLead(lead) {
+    const article = document.createElement("article");
+    const content = document.createElement("div");
+    const status = document.createElement("span");
+    const title = document.createElement("h3");
+    const meta = document.createElement("p");
+    const propertyLink = document.createElement("a");
+    const contact = document.createElement("div");
+    const phone = document.createElement("strong");
+    const date = document.createElement("time");
+    const whatsapp = document.createElement("a");
+    const statusControl = document.createElement("div");
+    const statusField = document.createElement("label");
+    const statusCaption = document.createElement("span");
+    const statusSelect = document.createElement("select");
+    const statusFeedback = document.createElement("p");
+    const deleteButton = document.createElement("button");
+
+    const rawStatus = lead.status || "new";
+    const whatsappDigits = getWhatsappDigits(lead.whatsapp);
+    const property = Array.isArray(lead.properties)
+        ? lead.properties[0] || null
+        : lead.properties || null;
+
+    article.className = "admin-request";
+    article.dataset.propertyLeadId = lead.id;
+    content.className = "admin-request__content";
+    contact.className = "admin-request__contact";
+    phone.className = "admin-request__phone";
+    date.className = "admin-request__date";
+    whatsapp.className = "admin-request__action";
+    statusControl.className = "admin-request__status-control";
+    statusField.className = "admin-request__status-field";
+    statusSelect.className = "admin-request__status-select";
+    statusFeedback.className = "admin-request__status-feedback";
+    propertyLink.className = "admin-property-lead__property";
+    deleteButton.type = "button";
+    deleteButton.className = "admin-request__delete";
+
+    setPropertyLeadStatusAppearance(status, rawStatus);
+    title.textContent = lead.name || "Nome não informado";
+    meta.textContent = property?.title || "Imóvel removido ou indisponível";
+
+    if (property?.id) {
+        propertyLink.href = `./imovel.html?id=${encodeURIComponent(property.id)}`;
+        propertyLink.textContent = "Abrir imóvel →";
+    } else {
+        propertyLink.hidden = true;
+    }
+
+    phone.textContent = formatWhatsapp(lead.whatsapp);
+    date.textContent = formatRequestDate(lead.created_at);
+
+    if (lead.created_at && !Number.isNaN(new Date(lead.created_at).getTime())) {
+        date.dateTime = lead.created_at;
+    }
+
+    if (whatsappDigits) {
+        whatsapp.href = `https://wa.me/${getInternationalWhatsapp(lead.whatsapp)}`;
+        whatsapp.target = "_blank";
+        whatsapp.rel = "noopener noreferrer";
+        whatsapp.textContent = "Entrar em contato ↗";
+        whatsapp.setAttribute(
+            "aria-label",
+            `Entrar em contato com ${lead.name || "interessado"} pelo WhatsApp`
+        );
+    } else {
+        whatsapp.hidden = true;
+    }
+
+    statusCaption.textContent = "Status";
+
+    if (!isKnownPropertyLeadStatus(rawStatus)) {
+        const currentOption = document.createElement("option");
+
+        currentOption.value = rawStatus;
+        currentOption.textContent = rawStatus;
+        currentOption.disabled = true;
+        statusSelect.append(currentOption);
+    }
+
+    Object.entries(propertyLeadStatusLabels).forEach(([value, label]) => {
+        const option = document.createElement("option");
+
+        option.value = value;
+        option.textContent = label;
+        statusSelect.append(option);
+    });
+
+    statusSelect.value = rawStatus;
+    statusSelect.setAttribute(
+        "aria-label",
+        `Status do interesse de ${lead.name || "interessado"}`
+    );
+    statusFeedback.setAttribute("role", "status");
+    statusFeedback.setAttribute("aria-live", "polite");
+
+    statusSelect.addEventListener("change", () => {
+        updatePropertyLeadStatus({
+            lead,
+            nextStatus: statusSelect.value,
+            select: statusSelect,
+            status,
+            article,
+            feedback: statusFeedback
+        });
+    });
+
+    deleteButton.textContent = "Remover interesse";
+    deleteButton.setAttribute(
+        "aria-label",
+        `Remover interesse de ${lead.name || "interessado"}`
+    );
+    deleteButton.addEventListener("click", () => {
+        deletePropertyLead({
+            lead,
+            article,
+            button: deleteButton
+        });
+    });
+
+    content.append(status, title, meta);
+
+    if (!propertyLink.hidden) {
+        content.append(propertyLink);
+    }
+
+    statusField.append(statusCaption, statusSelect);
+    statusControl.append(statusField, statusFeedback);
+    contact.append(phone, date, whatsapp, statusControl, deleteButton);
+    article.append(content, contact);
+
+    return article;
+}
+
+function renderPropertyLeads(leads) {
+    propertyLeads = leads;
+    updatePropertyLeadsCount();
+
+    if (!leads.length) {
+        const empty = document.createElement("p");
+
+        empty.className = "admin-posts__empty";
+        empty.textContent = "Nenhum interesse em imóveis recebido.";
+        propertyLeadsList.replaceChildren(empty);
+        return;
+    }
+
+    propertyLeadsList.replaceChildren(...leads.map(createPropertyLead));
+}
+
+function renderPropertyLeadsError() {
+    const error = document.createElement("p");
+
+    error.className = "admin-posts__empty admin-posts__empty--error";
+    error.textContent = "Não foi possível carregar os interesses em imóveis.";
+    propertyLeads = [];
+    propertyLeadsCount.textContent = "—";
+    propertyLeadsCount.setAttribute(
+        "aria-label",
+        "Não foi possível contar os novos interesses em imóveis"
+    );
+    propertyLeadsList.replaceChildren(error);
+}
+
 function formatPropertyPrice(property) {
     if (property.price_on_request) {
         return "Valor sob consulta";
@@ -677,7 +1010,13 @@ async function loadAdminPanel() {
     adminName.textContent = membership.display_name || "Roberto";
     panel.hidden = false;
 
-    const [requestsResult, filesResult, propertiesResult, postsResult] = await Promise.all([
+    const [
+        requestsResult,
+        filesResult,
+        propertyLeadsResult,
+        propertiesResult,
+        postsResult
+    ] = await Promise.all([
         window.supabaseClient
             .from("legal_requests")
             .select("id, created_at, name, whatsapp, city, request_type, status")
@@ -686,6 +1025,24 @@ async function loadAdminPanel() {
             .from("legal_request_files")
             .select("id, request_id, storage_path, original_name, mime_type, size_bytes, created_at")
             .order("created_at", { ascending: true }),
+        window.supabaseClient
+            .from("property_leads")
+            .select(`
+                id,
+                created_at,
+                property_id,
+                name,
+                whatsapp,
+                privacy_consent,
+                status,
+                properties (
+                    id,
+                    title,
+                    slug,
+                    status
+                )
+            `)
+            .order("created_at", { ascending: false }),
         window.supabaseClient
             .from("properties")
             .select("id, title, purpose, price, price_on_request, city, state, neighborhood, status, updated_at")
@@ -698,6 +1055,10 @@ async function loadAdminPanel() {
 
     const { data: requests, error: requestsError } = requestsResult;
     const { data: requestFiles, error: requestFilesError } = filesResult;
+    const {
+        data: propertyLeadsData,
+        error: propertyLeadsError
+    } = propertyLeadsResult;
     const { data: properties, error: propertiesError } = propertiesResult;
     const { data: posts, error: postsError } = postsResult;
 
@@ -723,6 +1084,16 @@ async function loadAdminPanel() {
         renderRequestsError();
     } else {
         renderLegalRequests(requestsWithFiles);
+    }
+
+    if (propertyLeadsError) {
+        console.error(
+            "Erro ao carregar interesses em imóveis:",
+            propertyLeadsError
+        );
+        renderPropertyLeadsError();
+    } else {
+        renderPropertyLeads(propertyLeadsData || []);
     }
 
     if (propertiesError) {
